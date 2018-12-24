@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- import jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <!-- import Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.7.1/firebase.js"></script>
+    <!-- import Firebase Config -->
+    <script src="./assets/js/firebase-config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- NAV -->
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper blue darken-4">
+                <i id='toggler' class="material-icons icon-light">menu</i>
+                <a href="#!" class="brand-logo center">Logo</a>
+                <ul id="nav-items" class="right hide-on-med-and-down"></ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="sidenav">
+        <div id='sideNavTitle' class='valign-wrapper blue darken-4 z-depth-3'>
+            <i id='side-toggler' class='small material-icons icon-light'>menu</i>
+            <span id='side-logo'><a href='#' class='blue darken-4 white-text'>Logo</a></span>
+        </div>
+        <ul id="slide-out" ></ul>
+    </div>
+   
+    
+    
+    
+
+    <!-- NAV -->
+
+    <!-- MAIN CONTENT -->
+    <div id='main-content' class="container"></div>
+    <!-- MAIN CONTENT -->
+
+    <!-- MODAL -->
+    <!-- Modal Structure -->
+    <div id="form-modal" class="modal">
+        <div id="form-modal-content" class="modal-content">
+            
+        </div>
+        <div id="form-modal-footer" class="modal-footer">
+            <!-- <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a> -->
+        </div>
+    </div>
+    <!-- MODAL -->
+
+
+    <script src="./assets/js/materialize-config.js"></script>
+    <script src="./assets/js/app.js"></script>
+</body>
+
+</html>
