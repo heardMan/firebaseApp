@@ -19,8 +19,7 @@ i.icon-light {
     width: 100%;
 }
 .acctField{
-    width: 100%;
-    margin: auto;
+    margin-bottom: 0;
 }
 
 #accountPanel{

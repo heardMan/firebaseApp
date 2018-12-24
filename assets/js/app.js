@@ -83,38 +83,68 @@ var app = {
         });
     },
     accountPage: function (data) {
-        var name = data.firstName + ' ' + data.lastName;
-        var email = data.email;
+
+        var inputFName = `<div id='inputFName' class='input-field'>
+                            <i class='material-icons prefix'>account_circle</i>
+                            <input disabled id='yourFirstName' type='text' class='validate' placeholder='${data.firstName}'>
+                            <label for='firstName'></label>
+                          </div>`;
+
+        var inputLName = `<div id='inputLName' class='input-field'>
+                            <i class='material-icons prefix'></i>
+                            <input disabled id='yourLastName' type='text' class='validate' placeholder='${data.lastName}'>
+                            <label for='lastName'></label>
+                          </div>`;
+
+        var inputEmail = `<div id='inputEmail' class='input-field'>
+                            <i class='material-icons prefix'>email</i>
+                            <input disabled id='yourEmail' type='email' class='validate' placeholder='${data.email}'>
+                            <label for='email'></label>
+                          </div>`;
+
+        var editFName = `<a id='editFName' data='edit' class='btn-floating edit'>
+                            <i id='editFNameIcon' class="small material-icons">edit</i>
+                         </a>`;
+
+        var editLName = `<a id='editLName' data='edit' class='btn-floating edit'>
+                            <i id='editLNameIcon' class="small material-icons">edit</i>
+                         </a>`;
+
+        var editEmail = `<a id='editEmail' data='edit' class='btn-floating edit'>
+                            <i id='editEmailIcon' class="small material-icons">edit</i>
+                         </a>`;
+
+        var acctInfoFName = `<div class='row acctField'>
+                                <div class='col s9'>${inputFName}</div>
+                                <div class='col sm2 valign-wrapper'>${editFName}</a></div>
+                             </div>`;
+
+        var acctInfoLName = `<div class='row acctField'>
+                                <div class='col s9'>${inputLName}</div>
+                                <div class='col sm2 valign-wrapper'>${editLName}</a></div>
+                             </div>`;
+
+        var acctInfoEmail = `<div class='row acctField'>
+                                <div class='col s9'>${inputEmail}</div>
+                                <div class='col sm2 valign-wrapper'>${editEmail}</div>
+                             </div>`;
+
         var accountInfo = `<div class='card horizontal blue-grey darken-1'>
                             <div id='acctInfoCont' class='card-content white-text'>
                                 <span class='card-title'>Card Title</span>
-                                <div class='row'>
-                                <div class='col s9'>
-                                    <div class='input-field'>
-                                        <i class='material-icons prefix'>account_circle</i>
-                                        <input id='firstName' type='text' class='validate'>
-                                        <label for='firstName'>First Name</label>
-                                    </div>
-                                </div>
-                                <div class='col sm2 valign-wrapper'><a class='btn-floating edit'><i class="small material-icons">edit</i></a></div>
-                                </div>
-                                <div class='row'>
-                                <div class='col s9'>
-                                    <div class='input-field'>
-                                        <i class='material-icons prefix'>email</i>
-                                        <input id='email' type='email' class='validate'>
-                                        <label for='email'>Email</label>
-                                    </div>
-                                </div>
-                                
-                                </div>
-                          </div>`;
+                                    ${acctInfoFName}
+                                    ${acctInfoLName}
+                                    ${acctInfoEmail}
+                            </div>`;
+
         var profilePic = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
+
         var profilePicCard = `<div class='card'>
                                 <div class='card-image'>
                                     <img src='${profilePic}'/>
                                 </div>
                               </div>`;
+
         var accountPanel = `<div id='accountSummary' class='row'>
                                 <div class='col s12'>
                                     <div id='accountPanel' class='card-panel teal'>
@@ -127,6 +157,53 @@ var app = {
                               </div>`;
         document.querySelector('#main-content').innerHTML = accountPanel;
 
+        document.querySelector('#editFName').addEventListener('click', function (e) {
+            e.preventDefault();
+            var status = document.querySelector('#editFName').getAttribute('data');
+            var icon = document.querySelector('#editFNameIcon');
+            var input = document.querySelector('#yourFirstName');
+            if (status === 'edit') {
+                icon.innerHTML = 'add';
+                document.querySelector('#editFName').setAttribute('data', 'add');
+                input.removeAttribute('disabled');
+            } else {
+                icon.innerHTML = 'edit';
+                document.querySelector('#editFName').setAttribute('data', 'edit');
+                input.setAttribute('disabled', '');
+            }
+        });
+
+        document.querySelector('#editLName').addEventListener('click', function (e) {
+            e.preventDefault();
+            var status = document.querySelector('#editLName').getAttribute('data');
+            var icon = document.querySelector('#editLNameIcon');
+            var input = document.querySelector('#yourLastName');
+            if (status === 'edit') {
+                icon.innerHTML = 'add';
+                document.querySelector('#editLName').setAttribute('data', 'add');
+                input.removeAttribute('disabled');
+            } else {
+                icon.innerHTML = 'edit';
+                document.querySelector('#editLName').setAttribute('data', 'edit');
+                input.setAttribute('disabled', '');
+            }
+        });
+
+        document.querySelector('#editEmail').addEventListener('click', function (e) {
+            e.preventDefault();
+            var status = document.querySelector('#editEmail').getAttribute('data');
+            var icon = document.querySelector('#editEmailIcon');
+            var input = document.querySelector('#yourEmail');
+            if (status === 'edit') {
+                icon.innerHTML = 'add';
+                document.querySelector('#editEmail').setAttribute('data', 'add');
+                input.removeAttribute('disabled');
+            } else {
+                icon.innerHTML = 'edit';
+                document.querySelector('#editEmail').setAttribute('data', 'edit');
+                input.setAttribute('disabled', '');
+            }
+        });
 
 
     },
