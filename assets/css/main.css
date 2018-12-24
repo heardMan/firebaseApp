@@ -17,8 +17,20 @@ i.icon-light {
 }
 #acctInfoCont{
     width: 100%;
+    margin: 0;
 }
+#passCollapse{
+    border:none!important;
+}
+#passCollapse-header{
+    border:none!important;
+}
+#passCollapse-body{
+    border:none!important;
+}
+
 .acctField{
+    width: 100%;
     margin-bottom: 0;
 }
 

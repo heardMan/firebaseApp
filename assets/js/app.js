@@ -20,7 +20,9 @@ var app = {
         document.querySelector('#side-toggler').addEventListener('click', function (e) {
             e.preventDefault();
             var elem = document.querySelector('.sidenav');
+            console.log(elem);
             var instance = M.Sidenav.getInstance(elem);
+            console.log(instance);
             instance.close();
         });
     },
@@ -102,6 +104,18 @@ var app = {
                             <label for='email'></label>
                           </div>`;
 
+        var inputPass = `<div id='inputPass' class='input-field'>
+                          <i class='material-icons prefix'>lock_outline</i>
+                          <input disabled id='yourPass' type='password' class='validate' placeholder='enter a new password'>
+                          <label for='email'></label>
+                        </div>`;
+
+        var confirmPass = `<div id='confirmPass' class='input-field'>
+                        <i class='material-icons prefix'>lock</i>
+                        <input disabled id='confirmYourPass' type='password' class='validate' placeholder='confirm password'>
+                        <label for='email'></label>
+                      </div>`;
+
         var editFName = `<a id='editFName' data='edit' class='btn-floating edit'>
                             <i id='editFNameIcon' class="small material-icons">edit</i>
                          </a>`;
@@ -114,27 +128,62 @@ var app = {
                             <i id='editEmailIcon' class="small material-icons">edit</i>
                          </a>`;
 
+        var editPass = `<a id='editPass' class='btn-floating edit'>
+                         <i id='editPassIcon' class="small material-icons">edit</i>
+                      </a>`;
+
+        var addNewPass = `<a id='confirmPass' class='btn-floating edit'>
+                         <i id='confirmPassIcon' class="small material-icons">add</i>
+                      </a>`;
+
         var acctInfoFName = `<div class='row acctField'>
                                 <div class='col s9'>${inputFName}</div>
-                                <div class='col sm2 valign-wrapper'>${editFName}</a></div>
+                                <div class='col s2 valign-wrapper'>${editFName}</a></div>
                              </div>`;
 
         var acctInfoLName = `<div class='row acctField'>
                                 <div class='col s9'>${inputLName}</div>
-                                <div class='col sm2 valign-wrapper'>${editLName}</a></div>
+                                <div class='col s2 valign-wrapper'>${editLName}</a></div>
                              </div>`;
 
         var acctInfoEmail = `<div class='row acctField'>
                                 <div class='col s9'>${inputEmail}</div>
-                                <div class='col sm2 valign-wrapper'>${editEmail}</div>
+                                <div class='col s2 valign-wrapper'>${editEmail}</div>
                              </div>`;
+
+        var acctInfoPass= `<div class='row acctField'>
+                             <div class='col s9'>${inputPass}</div>
+                             <div class='col s2 valign-wrapper'>${editPass}</div>
+                          </div>`;
+
+        var acctConfirmPass = `<div id='addanewpassword' class='row acctField'>
+                                <div class= 'col s12'>
+                                <ul id='passCollapse' data='closed' class="collapsible z-depth-0">
+                                <li>
+                                  <div id='passCollapse-header' class=" blue-grey darken-1">
+                                    <div class='row acctField'>
+                                    <div class='col s9'>${inputPass}</div>
+                                    <div class='col s2 valign-wrapper'>${editPass}</div>
+                                    </div>
+                                  </div>
+                                  <div id='passCollapse-body' class="collapsible-body blue-grey darken-1">
+                                  <div class='row acctField'>
+                                  <div class='col s9'>${confirmPass}</div>
+                                  <div class='col s2 valign-wrapper'>${addNewPass}</div>
+                                  </div>
+                                  </div>
+                                </li>
+                                
+                                
+                              </ul>
+                                </div>
+                               </div>`;
 
         var accountInfo = `<div class='card horizontal blue-grey darken-1'>
                             <div id='acctInfoCont' class='card-content white-text'>
                                 <span class='card-title'>Card Title</span>
-                                    ${acctInfoFName}
-                                    ${acctInfoLName}
-                                    ${acctInfoEmail}
+                                    ${acctInfoFName+acctInfoLName+acctInfoEmail+acctConfirmPass}
+                                    
                             </div>`;
 
         var profilePic = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
@@ -156,7 +205,8 @@ var app = {
                                 </div>
                               </div>`;
         document.querySelector('#main-content').innerHTML = accountPanel;
-
+        //register click events
+        //first name
         document.querySelector('#editFName').addEventListener('click', function (e) {
             e.preventDefault();
             var status = document.querySelector('#editFName').getAttribute('data');
@@ -172,7 +222,7 @@ var app = {
                 input.setAttribute('disabled', '');
             }
         });
-
+        //lastname
         document.querySelector('#editLName').addEventListener('click', function (e) {
             e.preventDefault();
             var status = document.querySelector('#editLName').getAttribute('data');
@@ -188,7 +238,7 @@ var app = {
                 input.setAttribute('disabled', '');
             }
         });
-
+        //email
         document.querySelector('#editEmail').addEventListener('click', function (e) {
             e.preventDefault();
             var status = document.querySelector('#editEmail').getAttribute('data');
@@ -203,6 +253,37 @@ var app = {
                 document.querySelector('#editEmail').setAttribute('data', 'edit');
                 input.setAttribute('disabled', '');
             }
+        });
+        //password
+        //document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.collapsible');
+            
+            var instances = M.Collapsible.init(elems);
+        //});
+
+        document.querySelector('#editPass').addEventListener('click', function (e) {
+            e.preventDefault();
+            var state = document.querySelector('#passCollapse').getAttribute('data');
+            var newPass = document.querySelector('#yourPass');
+            var newPassConfirmed = document.querySelector('#confirmYourPass');
+            var elem = document.querySelector('.collapsible');
+            console.log(elem);
+            var instance = M.Collapsible.getInstance(elem);
+            console.log(instance);
+            if(state === 'closed'){
+                instance.open();
+                newPass.removeAttribute('disabled');
+                newPassConfirmed.removeAttribute('disabled');
+                document.querySelector('#passCollapse').setAttribute('data', 'open');
+                
+            } else{
+                instance.close();
+                newPass.setAttribute('disabled', '');
+                newPassConfirmed.setAttribute('disabled', '');
+                document.querySelector('#passCollapse').setAttribute('data', 'closed');
+            }
+            
+           
         });
 
 
