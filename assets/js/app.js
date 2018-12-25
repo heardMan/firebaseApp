@@ -1,5 +1,6 @@
 var app = {
     baseUI: function () {
+        console.log('baseUI start running');
         //create navbar base UI content
         var navAbout = `<li id='navAbout'><a href='#'>About</a></li>`;
         var navContact = `<li id='navContact'><a href='#'>Contact</a></li>`;
@@ -9,32 +10,32 @@ var app = {
         var sideContact = `<li id='sideContact'><a href='#'>Contact</a></li>`;
         document.querySelector('#slide-out').innerHTML = sideAbout + sideContact;
         //check authorization status
-        app.getUserAuthState(app.loggedInUI, app.loggedOutUI)
+        app.getUserAuthState(app.loggedInUI, app.loggedOutUI);
         //register click events
         document.querySelector('#toggler').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#toggler clicked');
             var elem = document.querySelector('.sidenav');
             var instance = M.Sidenav.getInstance(elem);
             instance.open();
         });
         document.querySelector('#side-toggler').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#side-toggler clicked');
             var elem = document.querySelector('.sidenav');
-            console.log(elem);
+            
             var instance = M.Sidenav.getInstance(elem);
-            console.log(instance);
+            
             instance.close();
         });
+        console.log('baseUI end running');
     },
     loggedInUI: function (user) {
+        console.log('loggedInUI start running');
         // User is signed in.
         console.log('user signed in');
-        //remove signed out ui content
-        var signedOutContent = document.querySelectorAll('.signIn');
-        for (var i = 0; i < signedOutContent.length; i++) {
-            signedOutContent[i].parentNode.removeChild(signedOutContent[i])
-        }
-
         //user profile information
 
         var emailVerified = user.emailVerified;
@@ -42,49 +43,68 @@ var app = {
         var name;
         var email;
         var photoUrl = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
-        console.log(user);
+        // console.log(user);
 
-        console.log(uid);
+        //console.log(uid);
+        if (emailVerified === false) {
+            console.log('user Not Verified');
+            app.verifyEmail(user);
+            app.logOut();
+        } else {
+            console.log('user Verified');
+            firebase.database().ref('users/' + uid).on('value', function (snapshot) {
 
-        firebase.database().ref('users/' + uid).on('value', function (snapshot) {
-            console.log(snapshot.val());
-            var data = snapshot.val();
-            name = data.firstName + ' ' + data.lastName;
-            email = data.email;
+                //console.log(snapshot.val());
+                var data = snapshot.val();
+                name = data.firstName + ' ' + data.lastName;
+                email = data.email;
 
-
-            //add signed in ui content
-            var navItems = document.querySelector('#nav-items').innerHTML;
-            var navMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
-            var navSignOut = `<li id='navSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
-            document.querySelector('#nav-items').innerHTML = navMyAccount + navItems + navSignOut;
-            var sideNavItems = document.querySelector('#slide-out').innerHTML;
-            var sideSignOut = `<li id='sideSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
-            var userImg = `<a href='#'><img class='circle' src='${photoUrl}'/></a>`;
-            var userName = `<a href='#'><span class='white-text name'>${name}</span></a>`;
-            var userEmail = `<a id='sideEmail'  href='#'><span class='white-text email'>${email}</span></a>`;
-            var userView = `<div class='user-view'><div class='background blue darken-3'>${userImg + userName + userEmail}</div></div>`;
-            var user = `<li id='sideUser'>${userView}</li>`;
-            var sideNavMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
-            document.querySelector('#slide-out').innerHTML = user + sideNavMyAccount + sideNavItems + sideSignOut;
-            //register click events
-            var myAccount = document.querySelectorAll('.myAccount');
-            for (var i = 0; i < myAccount.length; i++) {
-                myAccount[i].addEventListener('click', function (e) {
-                    e.preventDefault();
-                    app.accountPage(data)
-                });
-            }
-            var signIn = document.querySelectorAll('.signOut');
-            for (var i = 0; i < signIn.length; i++) {
-                signIn[i].addEventListener('click', function (e) {
-                    e.preventDefault();
-                    app.logOut();
-                });
-            }
-        });
+                //remove signed out ui content
+                var signedOutContent = document.querySelectorAll('.signIn, #sideNavMyAccount, #navSignOut, #sideSignOut, #sideUser');
+                for (var i = 0; i < signedOutContent.length; i++) {
+                    signedOutContent[i].parentNode.removeChild(signedOutContent[i])
+                }
+                //add signed in ui content
+                var navItems = document.querySelector('#nav-items').innerHTML;
+                var navMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
+                var navSignOut = `<li id='navSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
+                document.querySelector('#nav-items').innerHTML = navMyAccount + navItems + navSignOut;
+                var sideNavItems = document.querySelector('#slide-out').innerHTML;
+                var sideSignOut = `<li id='sideSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
+                var userImg = `<a href='#'><img class='circle' src='${photoUrl}'/></a>`;
+                var userName = `<a href='#'><span class='white-text name'>${name}</span></a>`;
+                var userEmail = `<a id='sideEmail'  href='#'><span class='white-text email'>${email}</span></a>`;
+                var userView = `<div class='user-view'><div class='background blue darken-3'>${userImg + userName + userEmail}</div></div>`;
+                var user = `<li id='sideUser'>${userView}</li>`;
+                var sideNavMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
+                document.querySelector('#slide-out').innerHTML = user + sideNavMyAccount + sideNavItems + sideSignOut;
+                //register click events
+                var myAccount = document.querySelectorAll('.myAccount');
+                for (var i = 0; i < myAccount.length; i++) {
+                    myAccount[i].addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('.myAccount clicked');
+                        app.accountPage(data)
+                    });
+                }
+                var signIn = document.querySelectorAll('.signOut');
+                for (var i = 0; i < signIn.length; i++) {
+                    signIn[i].addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('.signOut clicked');
+                        app.logOut();
+                    });
+                }
+            });
+        }
+        console.log('loggedInUI end running');
     },
     accountPage: function (data) {
+        console.log('accountPage start running');
+        var user = firebase.auth().currentUser;
+
 
         var inputFName = `<div id='inputFName' class='input-field'>
                             <i class='material-icons prefix'>account_circle</i>
@@ -116,6 +136,8 @@ var app = {
                         <label for='email'></label>
                       </div>`;
 
+        var deleteAccountButton = `<a id='deleteAccount' class='btn'>Delete</a>`;
+
         var editFName = `<a id='editFName' data='edit' class='btn-floating edit'>
                             <i id='editFNameIcon' class="small material-icons">edit</i>
                          </a>`;
@@ -132,7 +154,7 @@ var app = {
                          <i id='editPassIcon' class="small material-icons">edit</i>
                       </a>`;
 
-        var addNewPass = `<a id='confirmPass' class='btn-floating edit'>
+        var addNewPass = `<a id='addNewPass' class='btn-floating edit'>
                          <i id='confirmPassIcon' class="small material-icons">add</i>
                       </a>`;
 
@@ -150,11 +172,6 @@ var app = {
                                 <div class='col s9'>${inputEmail}</div>
                                 <div class='col s2 valign-wrapper'>${editEmail}</div>
                              </div>`;
-
-        var acctInfoPass= `<div class='row acctField'>
-                             <div class='col s9'>${inputPass}</div>
-                             <div class='col s2 valign-wrapper'>${editPass}</div>
-                          </div>`;
 
         var acctConfirmPass = `<div id='addanewpassword' class='row acctField'>
                                 <div class= 'col s12'>
@@ -179,10 +196,14 @@ var app = {
                                 </div>
                                </div>`;
 
+        var deleteAccount = `<div class='row acctField'>
+                                <div class='col s12'>${deleteAccountButton}</div>
+                             </div>`;
+
         var accountInfo = `<div class='card horizontal blue-grey darken-1'>
                             <div id='acctInfoCont' class='card-content white-text'>
                                 <span class='card-title'>Card Title</span>
-                                    ${acctInfoFName+acctInfoLName+acctInfoEmail+acctConfirmPass}
+                                    ${acctInfoFName + acctInfoLName + acctInfoEmail + acctConfirmPass + deleteAccount}
                                     
                             </div>`;
 
@@ -209,6 +230,8 @@ var app = {
         //first name
         document.querySelector('#editFName').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#editFName clicked');
             var status = document.querySelector('#editFName').getAttribute('data');
             var icon = document.querySelector('#editFNameIcon');
             var input = document.querySelector('#yourFirstName');
@@ -220,11 +243,34 @@ var app = {
                 icon.innerHTML = 'edit';
                 document.querySelector('#editFName').setAttribute('data', 'edit');
                 input.setAttribute('disabled', '');
+                var newFName = document.querySelector('#yourFirstName').value;
+                var userId = data.userID;
+                console.log(userId);
+                data.firstName = newFName;
+                console.log(data);
+                firebase.database().ref('users/' + userId).update({
+                    'firstName': newFName
+                });
+                user.updateProfile({
+                    displayName: data.firstName + ' ' + data.lastName,
+                }).then(function () {
+                    // Update successful.
+                }).catch(function (error) {
+                    // An error happened.
+                });
+                document.querySelector('#yourFirstName').value = '';
+                document.querySelector('#yourFirstName').setAttribute('placeholder', data.firstName);
+                setTimeout(function () {
+                    document.querySelector('#yourFirstName').classList.remove('valid');
+                }, 1000 * 5);
+
             }
         });
         //lastname
         document.querySelector('#editLName').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#editLName clicked');
             var status = document.querySelector('#editLName').getAttribute('data');
             var icon = document.querySelector('#editLNameIcon');
             var input = document.querySelector('#yourLastName');
@@ -236,11 +282,34 @@ var app = {
                 icon.innerHTML = 'edit';
                 document.querySelector('#editLName').setAttribute('data', 'edit');
                 input.setAttribute('disabled', '');
+
+                var newLName = document.querySelector('#yourLastName').value;
+                var userId = data.userID;
+                console.log(userId);
+                data.lastName = newLName;
+                console.log(data);
+                firebase.database().ref('users/' + userId).update({
+                    'lastName': newLName
+                });
+                user.updateProfile({
+                    displayName: data.firstName + ' ' + data.lastName,
+                }).then(function () {
+                    // Update successful.
+                }).catch(function (error) {
+                    // An error happened.
+                });
+                document.querySelector('#yourLastName').value = '';
+                document.querySelector('#yourLastName').setAttribute('placeholder', data.lastName);
+                setTimeout(function () {
+                    document.querySelector('#yourLastName').classList.remove('valid');
+                }, 1000 * 5);
             }
         });
         //email
         document.querySelector('#editEmail').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#editEmail clicked');
             var status = document.querySelector('#editEmail').getAttribute('data');
             var icon = document.querySelector('#editEmailIcon');
             var input = document.querySelector('#yourEmail');
@@ -252,17 +321,64 @@ var app = {
                 icon.innerHTML = 'edit';
                 document.querySelector('#editEmail').setAttribute('data', 'edit');
                 input.setAttribute('disabled', '');
+
+                var newEmail = document.querySelector('#yourEmail').value;
+                var userId = data.userID;
+                console.log(userId);
+                data.email = newEmail;
+                console.log(data);
+                firebase.database().ref('users/' + userId).update({
+                    'email': newEmail
+                });
+                user.updateEmail(newEmail).then(function () {
+                    // Update successful.
+                }).catch(function (error) {
+                    // An error happened.
+                });
+                document.querySelector('#yourEmail').value = '';
+                document.querySelector('#yourEmail').setAttribute('placeholder', data.email);
+                setTimeout(function () {
+                    document.querySelector('#yourEmail').classList.remove('valid');
+                }, 1000 * 5);
             }
         });
         //password
-        //document.addEventListener('DOMContentLoaded', function () {
-            var elems = document.querySelectorAll('.collapsible');
+
+        document.querySelector('#addNewPass').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('#addNewPass clicked');
             
-            var instances = M.Collapsible.init(elems);
-        //});
+            var elem = document.querySelector('.collapsible');
+            var instance = M.Collapsible.getInstance(elem);
+            var newPass = document.querySelector('#yourPass');
+            var newPassConfirmed = document.querySelector('#confirmYourPass');
+            if (newPass.value === newPassConfirmed.value) {
+                console.log('its a match');
+                var newPassword = newPassConfirmed.value;
+                user.updatePassword(newPassword).then(function () {
+                    // Update successful.
+                }).catch(function (error) {
+                    // An error happened.
+                });
+                instance.close();
+                newPass.setAttribute('disabled', '');
+                newPassConfirmed.setAttribute('disabled', '');
+                document.querySelector('#passCollapse').setAttribute('data', 'closed');
+                document.querySelector('#yourPass').value = '';
+                document.querySelector('#confirmYourPass').value = '';
+                setTimeout(function () {
+                    document.querySelector('#yourPass').classList.remove('valid');
+                    document.querySelector('#confirmYourPass').classList.remove('valid');
+                }, 1000 * 5);
+
+            }
+        });
 
         document.querySelector('#editPass').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#editPass clicked');
             var state = document.querySelector('#passCollapse').getAttribute('data');
             var newPass = document.querySelector('#yourPass');
             var newPassConfirmed = document.querySelector('#confirmYourPass');
@@ -270,29 +386,50 @@ var app = {
             console.log(elem);
             var instance = M.Collapsible.getInstance(elem);
             console.log(instance);
-            if(state === 'closed'){
+            if (state === 'closed') {
                 instance.open();
                 newPass.removeAttribute('disabled');
                 newPassConfirmed.removeAttribute('disabled');
                 document.querySelector('#passCollapse').setAttribute('data', 'open');
-                
-            } else{
+
+            } else {
                 instance.close();
                 newPass.setAttribute('disabled', '');
                 newPassConfirmed.setAttribute('disabled', '');
                 document.querySelector('#passCollapse').setAttribute('data', 'closed');
+                document.querySelector('#yourPass').value = '';
+                document.querySelector('#confirmYourPass').value = '';
+
             }
-            
-           
+
+
+        });
+        //delete Account
+        document.querySelector('#deleteAccount').addEventListener('click', function (e) {
+            e.preventDefault();
+            console.log('#deleteAccount clicked');
+            console.log('risky');
+            e.stopPropagation();
+            //console.log(user);
+            app.deleteAccountModal(user);
+
+
         });
 
+        //initiate collapsible elements
+        var elems = document.querySelectorAll('.collapsible');
+        var instances = M.Collapsible.init(elems);
+        
+        console.log('accountPage end running');
 
     },
     loggedOutUI: function () {
+        console.log('loggedOutUI start running');
         //No user is signed in.
         console.log('user not signed in');
         //remove signed in ui content
-        var signedInContent = document.querySelectorAll(".myAccount, .signOut, #sideUser");
+        document.querySelector('#main-content').innerHTML = '';
+        var signedInContent = document.querySelectorAll(".signIn, .myAccount, .signOut, #sideUser");
         if (signedInContent) {
             for (var i = 0; i < signedInContent.length; i++)
                 signedInContent[i].parentNode.removeChild(signedInContent[i]);
@@ -309,15 +446,19 @@ var app = {
         var signIn = document.querySelectorAll('.signIn');
         for (var i = 0; i < signIn.length; i++) {
             signIn[i].addEventListener('click', function (e) {
+                e.stopPropagation();
                 e.preventDefault();
+                console.log('.signIn clicked');
                 var elem = document.querySelector('.sidenav');
                 var instance = M.Sidenav.getInstance(elem);
                 instance.close();
                 app.signInForm();
             });
         }
+        console.log('loggedOutUI end running');
     },
     signInForm: function () {
+        console.log('signInForm start running');
         //create sign in form content
         var title = `<h4>Sign In</h4>`;
         var email = `<input id='userEmail' type='email' placeholder='example@gmail.com'></input>`;
@@ -327,32 +468,67 @@ var app = {
         //update modal content
         document.querySelector('#form-modal-content').innerHTML = signInForm;
         //update modal footer
-        var register = `<div>Don't have an account? <a href='#' id='toRegister'>Register Here</a></div>`;
+        var register = `<div>Don't have an account? <a href='#' id='toRegister'>Register Here</a></div>
+                        <div><a id='passwordResetLink' href='#'>Reset Your Password</a></div>`;
         document.querySelector('#form-modal-footer').innerHTML = register;
         //register click events
         document.querySelector('#signInButton').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#signInButton clicked');
             var email = document.querySelector('#userEmail').value;
             var password = document.querySelector('#userPassword').value;
             app.logIn(email, password);
             var elem = document.querySelector('.modal');
             var instance = M.Modal.getInstance(elem);
             instance.close();
+
         });
         document.querySelector('#toRegister').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#toRegister clicked');
             var elem = document.querySelector('.modal');
             var instance = M.Modal.getInstance(elem);
             instance.close();
             app.registrationForm();
         });
+        document.querySelector('#passwordResetLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('#passwordResetLink clicked');
+            app.passWordResetModal();
+        });
+
         //open modal
         var elem = document.querySelector('.modal');
         var instance = M.Modal.getInstance(elem);
         instance.open();
+        console.log('signInForm end running');
+    },
+    passWordResetModal: function () {
+        console.log('passWordResetModal start running');
+        document.querySelector('#form-modal-content').innerHTML = `<div><div class="row">
+            <div class="input-field col s12">
+              <input id="emailForNewPass" type="email" class="validate">
+              <label for="email">Email</label>
+              <span class="helper-text" data-error="wrong" data-success="right">Helper text</span>
+            </div></div>`;
+        document.querySelector('#form-modal-footer').innerHTML = `<a id='sendNewPass' class='btn'>Reset Password</a>`;
 
+        document.querySelector('#sendNewPass').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('#sendNewPass clicked');
+            var email = document.querySelector('#emailForNewPass').value;
+            app.forgotPassword(email);
+        });
+
+        app.openModal();
+        console.log('passWordResetModal end running');
     },
     registrationForm: function () {
+        console.log('registrationForm start running');
         //create registration form content
         var title = `<h4>Create an Account</h4>`;
         var firstName = `<input id='newUserfName' type='email' placeholder='John'></input>`;
@@ -369,6 +545,8 @@ var app = {
         //register click events
         document.querySelector('#register').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#register clicked');
             app.createUser();
             var elem = document.querySelector('.modal');
             var instance = M.Modal.getInstance(elem);
@@ -377,6 +555,8 @@ var app = {
         });
         document.querySelector('#toSignIn').addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('#toSignIn clicked');
             var elem = document.querySelector('.modal');
             var instance = M.Modal.getInstance(elem);
             instance.close();
@@ -386,9 +566,43 @@ var app = {
         var elem = document.querySelector('.modal');
         var instance = M.Modal.getInstance(elem);
         instance.open();
+        console.log('registrationForm end running');
 
     },
+    deleteAccountModal: function (user) {
+        console.log('deleteAccountModal start running');
+        var content = `<div>Are you sure that you want to delete your account?</div>`;
+        var confirmation = `<div>
+                                <a id='deleteAcctLink' class='btn'> Delete Account </a>
+                                <a id='closeDeleteAccountModal' class='btn'> Go Back </a>
+                            </div>`;
+
+        document.querySelector('#form-modal-content').innerHTML = content;
+        document.querySelector('#form-modal-footer').innerHTML = confirmation;
+
+        document.querySelector('#deleteAcctLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('#deleteAcctLink clicked');
+            app.deleteUser(user);
+            //console.log(user);
+        });
+
+        document.querySelector('#closeDeleteAccountModal').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('#closeDeleteAccountModal clicked');
+            app.closeModal();
+        });
+
+        //open modal
+        var elem = document.querySelector('.modal');
+        var instance = M.Modal.getInstance(elem);
+        instance.open();
+        console.log('deleteAccountModal end running');
+    },
     createUser: function () {
+        console.log('createUser start running');
         var userFirstName = document.querySelector('#newUserfName').value;
         var userLastName = document.querySelector('#newUserlName').value;
         var email = document.querySelector('#newUserEmail').value;
@@ -417,6 +631,7 @@ var app = {
                 createNewProfile(uid, email);
 
 
+
             })
             .catch(function (error) {
                 // Handle Errors here.
@@ -427,25 +642,112 @@ var app = {
             });
         document.querySelector('#newUserEmail').value = '';
         document.querySelector('#newUserEmail').value = '';
+        console.log('createUser end running');
+
+    },
+    deleteUser: function (user) {
+        console.log('deleteUser start running');
+        // document.querySelector('#form-modal-content').innerHTML = '';
+        // document.querySelector('#form-modal-footer').innerHTML = '';
+        // document.querySelector('#form-modal-content').innerHTML = `<div>Account Successfully Deleted</div>`;
+        // document.querySelector('#form-modal-footer').innerHTML = `<a onClick='app.closeModal()'class='btn'>Ok</a>`;
+        // app.openModal();
+
+        user.delete().then(function () {
+            // User deleted.
+            document.querySelector('#form-modal-content').innerHTML = `<div>Account Successfully Deleted</div>`;
+            document.querySelector('#form-modal-footer').innerHTML = `<a id='accountDeletedOK' class='btn'>Ok</a>`;
+
+            document.querySelector('#accountDeletedOK').addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('#accountDeletedOK clicked');
+                app.closeModal();
+            });
+    
+
+            app.openModal();
 
 
+
+        }).catch(function (error) {
+            // An error happened.
+        });
+
+
+        console.log('deleteUser end running');
+
+    },
+    verifyEmail: function (user) {
+        console.log('verifyEmail start running');
+        user.sendEmailVerification().then(function () {
+            // Email sent.
+            document.querySelector('#form-modal-content').innerHTML = '';
+            document.querySelector('#form-modal-footer').innerHTML = '';
+            document.querySelector('#form-modal-content').innerHTML = `<div>
+                                                                        <p>A verification email has been sent to your email addess</p>
+                                                                        <p>Verify your email address to finish setting up your account</p>
+                                                                        </div>`;
+            app.openModal();
+
+        }).catch(function (error) {
+            // An error happened.
+        });
+        console.log('verifyEmail end running');
+    },
+    forgotPassword: function (email) {
+        console.log('forgotPassword start running');
+        var auth = firebase.auth();
+        var emailAddress = email;
+
+        auth.sendPasswordResetEmail(emailAddress).then(function () {
+            // Email sent.
+        }).catch(function (error) {
+            // An error happened.
+        });
+        console.log('forgotPassword end running');
+    },
+    openModal: function () {
+        console.log('openModal start running');
+        var elem = document.querySelector('.modal');
+        var instance = M.Modal.getInstance(elem);
+        instance.open();
+        console.log('openModal end running');
+    },
+    closeModal: function () {
+        console.log('closeModal start running');
+        var elem = document.querySelector('.modal');
+        var instance = M.Modal.getInstance(elem);
+        instance.close();
+        console.log('closeModal end running');
     },
     logIn: function (email, password) {
-        firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // ...
-        });
+        console.log('logIn start running');
+
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(function () {
+                
+            })
+            .catch(function (error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // ...
+            });
+            console.log('logIn end running');
     },
     logOut: function () {
+        console.log('logOut start running');
         firebase.auth().signOut().then(function () {
             // Sign-out successful.
         }).catch(function (error) {
             // An error happened.
+
         });
+        console.log('logOut end running');
     },
     getUserAuthState: function (loggedIn, loggedOut) {
+        console.log('getUserAuthState start running');
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 // User is signed in.
@@ -455,12 +757,15 @@ var app = {
                 loggedOut();
             }
         });
+        console.log('getUserAuthState end running');
     },
     init: function () {
+        console.log('init start running');
         document.addEventListener('DOMContentLoaded', function () {
             console.log("setting up user interface...");
             app.baseUI();
         });
+        console.log('init end running');
     }
 }
 app.init();
