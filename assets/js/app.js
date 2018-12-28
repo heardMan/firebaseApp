@@ -473,7 +473,20 @@ var app = {
 
         var convoPanel = `<div id='convoPanel' class='card-panel teal'></div>`;
 
-        var openConvo = `<div id='openConvo' class='card-panel teal'></div>`;
+        var messageInput = `<div class='row'>
+                                <div class="input-field col s9">
+                                    <input placeholder="Send a Message" id="newMessage" type="text" class="validate">
+                                    
+                                </div>
+                                <div class='col s3'>
+                                    <a id='sendMessage' class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">send</i></a>
+                                </div>
+                            </div>`;
+
+        var openConvo = `<div id='openConvo' class='card'>
+                            <div class="card-content white-text">Blah Blah</div>
+                            <div class="card-action">${messageInput}</div>
+                         </div>`;
 
         var messages = `<div id="messages">
                             <div class='row'>

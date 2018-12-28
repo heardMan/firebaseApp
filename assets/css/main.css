@@ -26,27 +26,16 @@ i.icon-light {
     
 }
 
-#messages{
-    height: 100%;
+#sendMessage{
+    margin: auto;
 }
 
 #messengerContent{
     height: 60vh;
 }
 
-#messagesrow{
-    height:100%;
-}
 
-#convoPanel{
-    height: 100%;
-}
-#openConvoCol{
-    height: 100%!important;
-}
-#openConvo{
-    height: 100%!important;
-}
+
 #acctInfoCont{
     width: 100%;
     margin: 0;
