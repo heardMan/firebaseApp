@@ -1,4 +1,7 @@
 var app = {
+    state: {
+        currentPage: null,
+    },
     baseUI: function () {
         console.log('baseUI start running');
         //create navbar base UI content
@@ -25,9 +28,7 @@ var app = {
             e.stopPropagation();
             console.log('#side-toggler clicked');
             var elem = document.querySelector('.sidenav');
-            
             var instance = M.Sidenav.getInstance(elem);
-            
             instance.close();
         });
         console.log('baseUI end running');
@@ -37,15 +38,15 @@ var app = {
         // User is signed in.
         console.log('user signed in');
         //user profile information
+        console.log(user);
 
         var emailVerified = user.emailVerified;
         var uid = user.uid;
-        var name;
-        var email;
-        var photoUrl = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
-        // console.log(user);
+        var name = user.displayName;
+        var email = user.email;
 
-        //console.log(uid);
+        var photoUrl = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
+    
         if (emailVerified === false) {
             console.log('user Not Verified');
             app.verifyEmail(user);
@@ -53,12 +54,10 @@ var app = {
         } else {
             console.log('user Verified');
             firebase.database().ref('users/' + uid).on('value', function (snapshot) {
-
                 //console.log(snapshot.val());
                 var data = snapshot.val();
                 name = data.firstName + ' ' + data.lastName;
                 email = data.email;
-
                 //remove signed out ui content
                 var signedOutContent = document.querySelectorAll('.signIn, #sideNavMyAccount, #navSignOut, #sideSignOut, #sideUser');
                 for (var i = 0; i < signedOutContent.length; i++) {
@@ -77,7 +76,8 @@ var app = {
                 var userView = `<div class='user-view'><div class='background blue darken-3'>${userImg + userName + userEmail}</div></div>`;
                 var user = `<li id='sideUser'>${userView}</li>`;
                 var sideNavMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
-                document.querySelector('#slide-out').innerHTML = user + sideNavMyAccount + sideNavItems + sideSignOut;
+                var messages = `<li id='userMessages'><a href='#' class='myMessages'>Messenger</a></li>`;
+                document.querySelector('#slide-out').innerHTML = user + sideNavMyAccount + messages + sideNavItems + sideSignOut;
                 //register click events
                 var myAccount = document.querySelectorAll('.myAccount');
                 for (var i = 0; i < myAccount.length; i++) {
@@ -97,14 +97,22 @@ var app = {
                         app.logOut();
                     });
                 }
+                var userMessages = document.querySelector('#userMessages');
+                userMessages.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    //e.stopPropagation();
+                    console.log(userMessages);
+                    app.messenger();
+
+                });
             });
         }
         console.log('loggedInUI end running');
     },
     accountPage: function (data) {
         console.log('accountPage start running');
-        var user = firebase.auth().currentUser;
 
+        var user = firebase.auth().currentUser;
 
         var inputFName = `<div id='inputFName' class='input-field'>
                             <i class='material-icons prefix'>account_circle</i>
@@ -160,39 +168,37 @@ var app = {
 
         var acctInfoFName = `<div class='row acctField'>
                                 <div class='col s9'>${inputFName}</div>
-                                <div class='col s2 valign-wrapper'>${editFName}</a></div>
+                                <div class='col s2 '>${editFName}</a></div>
                              </div>`;
 
         var acctInfoLName = `<div class='row acctField'>
                                 <div class='col s9'>${inputLName}</div>
-                                <div class='col s2 valign-wrapper'>${editLName}</a></div>
+                                <div class='col s2 '>${editLName}</a></div>
                              </div>`;
 
         var acctInfoEmail = `<div class='row acctField'>
                                 <div class='col s9'>${inputEmail}</div>
-                                <div class='col s2 valign-wrapper'>${editEmail}</div>
+                                <div class='col s2 '>${editEmail}</div>
                              </div>`;
 
         var acctConfirmPass = `<div id='addanewpassword' class='row acctField'>
                                 <div class= 'col s12'>
-                                <ul id='passCollapse' data='closed' class="collapsible z-depth-0">
-                                <li>
-                                  <div id='passCollapse-header' class=" blue-grey darken-1">
-                                    <div class='row acctField'>
-                                    <div class='col s9'>${inputPass}</div>
-                                    <div class='col s2 valign-wrapper'>${editPass}</div>
-                                    </div>
-                                  </div>
-                                  <div id='passCollapse-body' class="collapsible-body blue-grey darken-1">
-                                  <div class='row acctField'>
-                                  <div class='col s9'>${confirmPass}</div>
-                                  <div class='col s2 valign-wrapper'>${addNewPass}</div>
-                                  </div>
-                                  </div>
-                                </li>
-                                
-                                
-                              </ul>
+                                    <ul id='passCollapse' data='closed' class="collapsible z-depth-0">
+                                        <li>
+                                            <div id='passCollapse-header' class=" blue-grey darken-1">
+                                                <div class='row acctField'>
+                                                    <div class='col s9'>${inputPass}</div>
+                                                    <div class='col s2 '>${editPass}</div>
+                                                </div>
+                                            </div>
+                                            <div id='passCollapse-body' class="collapsible-body blue-grey darken-1">
+                                                <div class='row acctField'>
+                                                    <div class='col s9'>${confirmPass}</div>
+                                                    <div class='col s2 '>${addNewPass}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
                                </div>`;
 
@@ -203,8 +209,7 @@ var app = {
         var accountInfo = `<div class='card horizontal blue-grey darken-1'>
                             <div id='acctInfoCont' class='card-content white-text'>
                                 <span class='card-title'>Card Title</span>
-                                    ${acctInfoFName + acctInfoLName + acctInfoEmail + acctConfirmPass + deleteAccount}
-                                    
+                                    ${acctInfoFName + acctInfoLName + acctInfoEmail + acctConfirmPass + deleteAccount}    
                             </div>`;
 
         var profilePic = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
@@ -224,7 +229,9 @@ var app = {
                                         </div>
                                     </div>
                                 </div>
-                              </div>`;
+                            </div>`;
+
+        document.querySelector('#main-content').innerHTML = '';
         document.querySelector('#main-content').innerHTML = accountPanel;
         //register click events
         //first name
@@ -245,9 +252,7 @@ var app = {
                 input.setAttribute('disabled', '');
                 var newFName = document.querySelector('#yourFirstName').value;
                 var userId = data.userID;
-                console.log(userId);
                 data.firstName = newFName;
-                console.log(data);
                 firebase.database().ref('users/' + userId).update({
                     'firstName': newFName
                 });
@@ -348,7 +353,7 @@ var app = {
             e.preventDefault();
             e.stopPropagation();
             console.log('#addNewPass clicked');
-            
+
             var elem = document.querySelector('.collapsible');
             var instance = M.Collapsible.getInstance(elem);
             var newPass = document.querySelector('#yourPass');
@@ -419,7 +424,7 @@ var app = {
         //initiate collapsible elements
         var elems = document.querySelectorAll('.collapsible');
         var instances = M.Collapsible.init(elems);
-        
+
         console.log('accountPage end running');
 
     },
@@ -456,6 +461,60 @@ var app = {
             });
         }
         console.log('loggedOutUI end running');
+    },
+    messenger: function(){
+        
+
+        var somePhoto = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
+
+        var contacts = `<div id="contacts">
+                            Contacts
+                        </div>`;
+
+        var convoPanel = `<div class='card-panel teal'>convo panel</div>`;
+
+        var openConvo = `<div class='card-panel teal'>open convo</div>`;
+
+        var messages = `<div id="messages">
+                            <div class='row'>
+                                <div class='col s4'>${convoPanel}</div>
+                                <div class='col s8'>${openConvo}</div>
+                            </div>
+                        </div>`;
+
+        var messenger = `<div id='messenger' class='row'>
+                            <div class='col s12'>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <div>Title</div>
+                                    </div>
+                                    
+                                    <div id='messengerContent' class="card-content grey lighten-4">
+                                        ${contacts}
+                                        ${messages}
+                                    </div>
+
+                                    <div class="card-tabs">
+                                        <ul class="tabs tabs-fixed-width">
+                                            <li class="tab"><a href="#contacts">Contacts</a></li>
+                                            <li class="tab"><a href="#messages">Messages</a></li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>`;
+
+        document.querySelector('#main-content').innerHTML = '';
+        document.querySelector('#main-content').innerHTML = messenger;
+        
+        var el = document.querySelectorAll('.tabs');
+        var instances = M.Tabs.init(el);
+        var elem = document.querySelectorAll('.tab');
+        var instance = M.Tabs.getInstance(elem);
+        instance.select('#messages');
+        instance.select('#contacts');
+
     },
     signInForm: function () {
         console.log('signInForm start running');
@@ -614,8 +673,10 @@ var app = {
                 var uid = user.user.uid;
                 function createNewProfile(uid, userEmail) {
                     // A post entry.
+                    var defaultPhoto = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
                     var userData = {
                         userID: uid,
+                        profilePic: defaultPhoto,
                         firstName: userFirstName,
                         lastName: userLastName,
                         email: userEmail,
@@ -664,7 +725,7 @@ var app = {
                 console.log('#accountDeletedOK clicked');
                 app.closeModal();
             });
-    
+
 
             app.openModal();
 
@@ -726,7 +787,7 @@ var app = {
 
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then(function () {
-                
+
             })
             .catch(function (error) {
                 // Handle Errors here.
@@ -734,7 +795,7 @@ var app = {
                 var errorMessage = error.message;
                 // ...
             });
-            console.log('logIn end running');
+        console.log('logIn end running');
     },
     logOut: function () {
         console.log('logOut start running');
@@ -764,6 +825,7 @@ var app = {
         document.addEventListener('DOMContentLoaded', function () {
             console.log("setting up user interface...");
             app.baseUI();
+            M.AutoInit();
         });
         console.log('init end running');
     }

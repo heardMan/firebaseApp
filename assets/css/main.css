@@ -1,6 +1,16 @@
 body {
     background-color: #37474f;
 }
+
+#messengerContent{
+    height: 60vh;
+}
+
+#addNewPass{
+    width: 40px!important;
+    margin: 0!important;
+}
+
 #slide-out{
     margin-top: 0px;
 }
