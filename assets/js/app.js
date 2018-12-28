@@ -46,7 +46,7 @@ var app = {
         var email = user.email;
 
         var photoUrl = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
-    
+
         if (emailVerified === false) {
             console.log('user Not Verified');
             app.verifyEmail(user);
@@ -462,8 +462,8 @@ var app = {
         }
         console.log('loggedOutUI end running');
     },
-    messenger: function(){
-        
+    messenger: function () {
+
 
         var somePhoto = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
 
@@ -471,33 +471,33 @@ var app = {
                             Contacts
                         </div>`;
 
-        var convoPanel = `<div class='card-panel teal'>convo panel</div>`;
+        var convoPanel = `<div id='convoPanel' class='card-panel teal'></div>`;
 
-        var openConvo = `<div class='card-panel teal'>open convo</div>`;
+        var openConvo = `<div id='openConvo' class='card-panel teal'></div>`;
 
         var messages = `<div id="messages">
                             <div class='row'>
-                                <div class='col s4'>${convoPanel}</div>
-                                <div class='col s8'>${openConvo}</div>
+                                <div class='col m4 hide-on-small-only'>${convoPanel}</div>
+                                <div class='col s12 m8'>${openConvo}</div>
                             </div>
                         </div>`;
 
         var messenger = `<div id='messenger' class='row'>
                             <div class='col s12'>
-                                <div class="card">
-                                    <div class="card-content">
+                                <div class='card'>
+                                    <div class='card-content'>
                                         <div>Title</div>
                                     </div>
                                     
-                                    <div id='messengerContent' class="card-content grey lighten-4">
+                                    <div id='messengerContent' class='card-content grey lighten-4'>
                                         ${contacts}
                                         ${messages}
                                     </div>
 
-                                    <div class="card-tabs">
-                                        <ul class="tabs tabs-fixed-width">
-                                            <li class="tab"><a href="#contacts">Contacts</a></li>
-                                            <li class="tab"><a href="#messages">Messages</a></li>
+                                    <div class='card-tabs'>
+                                        <ul class='tabs tabs-fixed-width'>
+                                            <li id='contactsTab' class='tab'><a href='#contacts'>Contacts</a></li>
+                                            <li id='messagesTab'class='tab'><a href='#messages'>Messages</a></li>
                                         </ul>
                                     </div>
 
@@ -507,14 +507,13 @@ var app = {
 
         document.querySelector('#main-content').innerHTML = '';
         document.querySelector('#main-content').innerHTML = messenger;
-        
-        var el = document.querySelectorAll('.tabs');
-        var instances = M.Tabs.init(el);
-        var elem = document.querySelectorAll('.tab');
-        var instance = M.Tabs.getInstance(elem);
-        instance.select('#messages');
-        instance.select('#contacts');
+        //M.AutoInit();
 
+        var tabs = document.querySelectorAll('.tabs');
+        for(var i = 0; i < tabs.length; i++){
+            M.Tabs.init(tabs[i]);
+        }
+        
     },
     signInForm: function () {
         console.log('signInForm start running');
