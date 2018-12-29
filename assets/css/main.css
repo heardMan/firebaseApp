@@ -131,6 +131,12 @@ i.icon-light {
     overflow: scroll;
 }
 
+#contacts{
+    height: 51.5vh;
+    overflow-wrap: break-word;
+    overflow: scroll;
+}
+
 .sentMessage{
     width: 70%;
     margin: 0 0 0 20%;

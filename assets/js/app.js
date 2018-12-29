@@ -52,65 +52,65 @@ var app = {
         //     app.verifyEmail(user);
         //     app.logOut();
         // } else {
-            console.log('user Verified');
-            firebase.database().ref('users/' + uid).update({
-                'online': 'true'
-            });
-            firebase.database().ref('users/' + uid).on('value', function (snapshot) {
-                //console.log(snapshot.val());
-                var data = snapshot.val();
-                name = data.firstName + ' ' + data.lastName;
-                email = data.email;
-                //remove signed out ui content
-                var signedOutContent = document.querySelectorAll('.signIn, .myMessages, #sideNavMyAccount, #navSignOut, #sideSignOut, #sideUser');
-                for (var i = 0; i < signedOutContent.length; i++) {
-                    signedOutContent[i].parentNode.removeChild(signedOutContent[i])
-                }
-                //add signed in ui content
-                var navItems = document.querySelector('#nav-items').innerHTML;
-                var navMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
-                var navSignOut = `<li id='navSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
-                document.querySelector('#nav-items').innerHTML = navMyAccount + navItems + navSignOut;
-                var sideNavItems = document.querySelector('#slide-out').innerHTML;
-                var sideSignOut = `<li id='sideSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
-                var userImg = `<a href='#'><img class='circle' src='${photoUrl}'/></a>`;
-                var userName = `<a href='#'><span class='white-text name'>${name}</span></a>`;
-                var userEmail = `<a id='sideEmail'  href='#'><span class='white-text email'>${email}</span></a>`;
-                var userView = `<div class='user-view'><div class='background blue darken-3'>${userImg + userName + userEmail}</div></div>`;
-                var sideUser = `<li id='sideUser'>${userView}</li>`;
-                var sideNavMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
-                var messages = `<li id='userMessages'><a href='#' class='myMessages'>Messenger</a></li>`;
-                document.querySelector('#slide-out').innerHTML = sideUser + sideNavMyAccount + messages + sideNavItems + sideSignOut;
-                //register click events
-                var myAccount = document.querySelectorAll('.myAccount');
-                for (var i = 0; i < myAccount.length; i++) {
-                    myAccount[i].addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('.myAccount clicked');
-                        app.accountPage(data)
-                    });
-                }
-                var signIn = document.querySelectorAll('.signOut');
-                for (var i = 0; i < signIn.length; i++) {
-                    signIn[i].addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('.signOut clicked');
-                        
-                        app.logOut(user);
-                    });
-                }
-                var userMessages = document.querySelector('#userMessages');
-                userMessages.addEventListener('click', function (e) {
+        console.log('user Verified');
+        firebase.database().ref('users/' + uid).update({
+            'online': 'true'
+        });
+        firebase.database().ref('users/' + uid).on('value', function (snapshot) {
+            //console.log(snapshot.val());
+            var data = snapshot.val();
+            name = data.firstName + ' ' + data.lastName;
+            email = data.email;
+            //remove signed out ui content
+            var signedOutContent = document.querySelectorAll('.signIn, .myMessages, #sideNavMyAccount, #navSignOut, #sideSignOut, #sideUser');
+            for (var i = 0; i < signedOutContent.length; i++) {
+                signedOutContent[i].parentNode.removeChild(signedOutContent[i])
+            }
+            //add signed in ui content
+            var navItems = document.querySelector('#nav-items').innerHTML;
+            var navMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
+            var navSignOut = `<li id='navSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
+            document.querySelector('#nav-items').innerHTML = navMyAccount + navItems + navSignOut;
+            var sideNavItems = document.querySelector('#slide-out').innerHTML;
+            var sideSignOut = `<li id='sideSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
+            var userImg = `<a href='#'><img class='circle' src='${photoUrl}'/></a>`;
+            var userName = `<a href='#'><span class='white-text name'>${name}</span></a>`;
+            var userEmail = `<a id='sideEmail'  href='#'><span class='white-text email'>${email}</span></a>`;
+            var userView = `<div class='user-view'><div class='background blue darken-3'>${userImg + userName + userEmail}</div></div>`;
+            var sideUser = `<li id='sideUser'>${userView}</li>`;
+            var sideNavMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
+            var messages = `<li id='userMessages'><a href='#' class='myMessages'>Messenger</a></li>`;
+            document.querySelector('#slide-out').innerHTML = sideUser + sideNavMyAccount + messages + sideNavItems + sideSignOut;
+            //register click events
+            var myAccount = document.querySelectorAll('.myAccount');
+            for (var i = 0; i < myAccount.length; i++) {
+                myAccount[i].addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    app.messenger(user);
-                    
-                    
-
+                    console.log('.myAccount clicked');
+                    app.accountPage(data)
                 });
+            }
+            var signIn = document.querySelectorAll('.signOut');
+            for (var i = 0; i < signIn.length; i++) {
+                signIn[i].addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('.signOut clicked');
+
+                    app.logOut(user);
+                });
+            }
+            var userMessages = document.querySelector('#userMessages');
+            userMessages.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                app.messenger(user);
+
+
+
             });
+        });
         //}
 
         console.log('loggedInUI end running');
@@ -473,7 +473,7 @@ var app = {
         var somePhoto = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
 
         var contacts = `<div id="contacts">
-                            Contacts
+                            
                         </div>`;
 
         var convoPanel = `<div id='convoPanel' class='card-panel teal'></div>`;
@@ -526,7 +526,7 @@ var app = {
 
         document.querySelector('#main-content').innerHTML = '';
         document.querySelector('#main-content').innerHTML = messenger;
-        app.displayOnlineUsers()
+        app.displayUsers()
         //enter key sends message
         document.querySelector('#newMessage').onkeypress = function (e) {
             if (!e) e = window.event;
@@ -550,24 +550,59 @@ var app = {
         }
 
     },
-    displayOnlineUsers: function(){
-        var target = document.querySelector('#convoPanel');
+    displayUsers: function () {
+        var target = document.querySelector('#contacts');
         firebase.database().ref('users/').on('child_added', function (snapshot) {
             var data = snapshot.val();
-            
+
             var priorContent = target.innerHTML;
             var img = data.profilePic;
-            var name = data.firstName + ' ' + data.lastName;
+            var nameData = data.firstName + ' ' + data.lastName;
+            var name = `<div>${nameData}</div>`;
+            console.log(data);
+            if (data.online === 'true') {
+                var onlineStatus = `<div class='green-text'>Online</div>`;
+                var chatButton = `<div><a id='chat${data.userID}' userID='${data.userID}' class="chatButton btn-floating btn-large waves-effect waves-light green"><i class="material-icons">message</i></a></div>`;
+            } else {
+                var onlineStatus = `<div class='red-text'>Offline</div>`;
+                var chatButton = `<div><a id='chat${data.userID}' userID='${data.userID}' class="chatButton btn-floating btn-large waves-effect waves-light red"><i class="material-icons">message</i></a></div>`;
+            }
+
+            //var signedIn = `<div class='red-text'>Offline</div>`;
             var newContent = `<div id='' class='row'>
                                 <div class='col s4'>
                                     <img class='circle responsive-img' src='${img}'>
                                 </div>
                                 <div class='col s8'>
-                                    <div>${name}</div>
+                                    ${name + onlineStatus + chatButton}
+                                    
                                 </div>
                               </div>`;
             target.innerHTML = priorContent + newContent;
+
+            var startChat = document.querySelectorAll('.chatButton');
+            console.log(startChat.length);
+            for (var i = 0; i < startChat.length; i++) {
+                var currentChatButton = startChat[i];
+                console.log(currentChatButton);
+                currentChatButton.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    var userID = this.getAttribute('userID');
+                    console.log('.startChat clicked');
+                    console.log(userID);
+
+                    var el = document.querySelector('.tabs');
+                    var instance = M.Tabs.getInstance(el);
+                    instance.select('messages');
+
+
+                    //instance.select('messages');
+                });
+            }
+
         });
+
     },
 
     createNewMessage: function (user) {
@@ -746,7 +781,7 @@ var app = {
                         firstName: userFirstName,
                         lastName: userLastName,
                         email: userEmail,
-                        
+
                     };
                     // Write the new post's data simultaneously in the posts list and the user's post list.
                     var updates = {};
@@ -862,7 +897,7 @@ var app = {
         console.log('logIn end running');
     },
     logOut: function (user) {
-        var userId =  user.uid;
+        var userId = user.uid;
         console.log('logOut start running');
         firebase.auth().signOut().then(function () {
             // Sign-out successful.
