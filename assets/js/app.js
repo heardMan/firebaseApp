@@ -47,19 +47,22 @@ var app = {
 
         var photoUrl = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
 
-        if (emailVerified === false) {
-            console.log('user Not Verified');
-            app.verifyEmail(user);
-            app.logOut();
-        } else {
+        // if (emailVerified === false) {
+        //     console.log('user Not Verified');
+        //     app.verifyEmail(user);
+        //     app.logOut();
+        // } else {
             console.log('user Verified');
+            firebase.database().ref('users/' + uid).update({
+                'online': 'true'
+            });
             firebase.database().ref('users/' + uid).on('value', function (snapshot) {
                 //console.log(snapshot.val());
                 var data = snapshot.val();
                 name = data.firstName + ' ' + data.lastName;
                 email = data.email;
                 //remove signed out ui content
-                var signedOutContent = document.querySelectorAll('.signIn, #sideNavMyAccount, #navSignOut, #sideSignOut, #sideUser');
+                var signedOutContent = document.querySelectorAll('.signIn, .myMessages, #sideNavMyAccount, #navSignOut, #sideSignOut, #sideUser');
                 for (var i = 0; i < signedOutContent.length; i++) {
                     signedOutContent[i].parentNode.removeChild(signedOutContent[i])
                 }
@@ -74,10 +77,10 @@ var app = {
                 var userName = `<a href='#'><span class='white-text name'>${name}</span></a>`;
                 var userEmail = `<a id='sideEmail'  href='#'><span class='white-text email'>${email}</span></a>`;
                 var userView = `<div class='user-view'><div class='background blue darken-3'>${userImg + userName + userEmail}</div></div>`;
-                var user = `<li id='sideUser'>${userView}</li>`;
+                var sideUser = `<li id='sideUser'>${userView}</li>`;
                 var sideNavMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
                 var messages = `<li id='userMessages'><a href='#' class='myMessages'>Messenger</a></li>`;
-                document.querySelector('#slide-out').innerHTML = user + sideNavMyAccount + messages + sideNavItems + sideSignOut;
+                document.querySelector('#slide-out').innerHTML = sideUser + sideNavMyAccount + messages + sideNavItems + sideSignOut;
                 //register click events
                 var myAccount = document.querySelectorAll('.myAccount');
                 for (var i = 0; i < myAccount.length; i++) {
@@ -94,19 +97,22 @@ var app = {
                         e.preventDefault();
                         e.stopPropagation();
                         console.log('.signOut clicked');
-                        app.logOut();
+                        
+                        app.logOut(user);
                     });
                 }
                 var userMessages = document.querySelector('#userMessages');
                 userMessages.addEventListener('click', function (e) {
                     e.preventDefault();
-                    //e.stopPropagation();
-                    console.log(userMessages);
-                    app.messenger();
+                    e.stopPropagation();
+                    app.messenger(user);
+                    
+                    
 
                 });
             });
-        }
+        //}
+
         console.log('loggedInUI end running');
     },
     accountPage: function (data) {
@@ -462,8 +468,7 @@ var app = {
         }
         console.log('loggedOutUI end running');
     },
-    messenger: function () {
-
+    messenger: function (user) {
 
         var somePhoto = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
 
@@ -474,6 +479,7 @@ var app = {
         var convoPanel = `<div id='convoPanel' class='card-panel teal'></div>`;
 
         var messageInput = `<div class='row'>
+
                                 <div class="input-field col s9">
                                     <input placeholder="Send a Message" id="newMessage" type="text" class="validate">
                                     
@@ -484,7 +490,7 @@ var app = {
                             </div>`;
 
         var openConvo = `<div id='openConvo' class='card'>
-                            <div class="card-content white-text">Blah Blah</div>
+                            <div id='convoContainer' class="card-content black-text"></div>
                             <div class="card-action">${messageInput}</div>
                          </div>`;
 
@@ -520,14 +526,62 @@ var app = {
 
         document.querySelector('#main-content').innerHTML = '';
         document.querySelector('#main-content').innerHTML = messenger;
-        //M.AutoInit();
+        app.displayOnlineUsers()
+        //enter key sends message
+        document.querySelector('#newMessage').onkeypress = function (e) {
+            if (!e) e = window.event;
+            var keyCode = e.keyCode || e.which;
+            if (keyCode == '13') {
+                // Enter pressed
+                app.createNewMessage(user);
+            }
+        }
 
+        //register click events
+        document.querySelector('#sendMessage').addEventListener('click', function (e) {
+            e.preventDefault();
+            app.createNewMessage(user);
+        });
+
+        //initiate tabs
         var tabs = document.querySelectorAll('.tabs');
-        for(var i = 0; i < tabs.length; i++){
+        for (var i = 0; i < tabs.length; i++) {
             M.Tabs.init(tabs[i]);
         }
-        
+
     },
+    displayOnlineUsers: function(){
+        var target = document.querySelector('#convoPanel');
+        firebase.database().ref('users/').on('child_added', function (snapshot) {
+            var data = snapshot.val();
+            
+            var priorContent = target.innerHTML;
+            var img = data.profilePic;
+            var name = data.firstName + ' ' + data.lastName;
+            var newContent = `<div id='' class='row'>
+                                <div class='col s4'>
+                                    <img class='circle responsive-img' src='${img}'>
+                                </div>
+                                <div class='col s8'>
+                                    <div>${name}</div>
+                                </div>
+                              </div>`;
+            target.innerHTML = priorContent + newContent;
+        });
+    },
+
+    createNewMessage: function (user) {
+        console.log(user);
+        var newMessage = document.querySelector('#newMessage').value;
+        var message = `<div class='sentMessage'>${newMessage}</div>`;
+        var convo = document.querySelector('#convoContainer');
+        var conversation = convo.innerHTML;
+        convo.innerHTML = conversation + message;
+
+
+        document.querySelector('#newMessage').value = '';
+    },
+
     signInForm: function () {
         console.log('signInForm start running');
         //create sign in form content
@@ -692,9 +746,7 @@ var app = {
                         firstName: userFirstName,
                         lastName: userLastName,
                         email: userEmail,
-                        userSessions: [],
-                        userPosts: [],
-                        userMessages: []
+                        
                     };
                     // Write the new post's data simultaneously in the posts list and the user's post list.
                     var updates = {};
@@ -809,10 +861,14 @@ var app = {
             });
         console.log('logIn end running');
     },
-    logOut: function () {
+    logOut: function (user) {
+        var userId =  user.uid;
         console.log('logOut start running');
         firebase.auth().signOut().then(function () {
             // Sign-out successful.
+            firebase.database().ref('users/' + userId).update({
+                'online': 'false'
+            });
         }).catch(function (error) {
             // An error happened.
 

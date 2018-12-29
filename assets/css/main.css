@@ -2,19 +2,80 @@ body {
     background-color: #37474f;
 }
 
-#messengerContent{
-    height: 60vh;
+#main-content{
+    width: 95%;
+    margin: auto;
 }
 
-#addNewPass{
-    width: 40px!important;
-    margin: 0!important;
+.container {
+    margin: 0;
 }
+
+#toggler{
+    display: inline;
+    font-size: 2em !important;
+    margin: 0px 0px 0px 20px;
+}
+
+/* SIDE NAV */
 
 #slide-out{
     margin-top: 0px;
 }
-.container {
+
+#side-toggler{
+    display: inline;
+    font-size: 2em !important;
+    margin: 0px 0px 0px 20px;
+}
+
+#side-logo{
+    font-size: 1.75em;
+    padding: 0px 10px 0px 35px
+    
+}
+
+#sideNavTitle{
+    height: 64px;
+}
+
+.user-view{
+    padding-bottom: 15px !important;
+}
+
+.background{
+    height: 150px !important;
+    padding: 25px 0px 0px 20px;
+    
+}
+
+#sideUser{
+    height: 150px !important;
+    
+}
+
+#sideEmail{
+    margin-bottom: 15px !important;
+}
+
+/*MODAL*/
+
+#form-modal-content {
+    text-align:center !important;
+}
+
+#form-modal-footer {
+    text-align:center !important;
+}
+
+/*ACCOUNT PAGE*/
+
+#accountPanel{
+    padding: 0.5em 0.75em 0.5em 0.75em!important;
+}
+
+#acctInfoCont{
+    width: 100%;
     margin: 0;
 }
 
@@ -26,20 +87,6 @@ i.icon-light {
     
 }
 
-#sendMessage{
-    margin: auto;
-}
-
-#messengerContent{
-    height: 60vh;
-}
-
-
-
-#acctInfoCont{
-    width: 100%;
-    margin: 0;
-}
 #passCollapse{
     border:none!important;
 }
@@ -55,69 +102,58 @@ i.icon-light {
     margin-bottom: 0;
 }
 
-#accountPanel{
-    padding: 0.5em 0.75em 0.5em 0.75em!important;
+#addNewPass{
+    width: 40px!important;
+    margin: 0!important;
 }
 
 #acctInfoCont{
     padding: 0.5em 0.5em 0.5em 0.5em!important;
 }
-#main-content{
-    width: 95%;
+
+/*MESSENGER*/
+
+#messengerContent{
+    height: 60vh;
+}
+
+#sendMessage{
     margin: auto;
 }
 
-#toggler{
-    display: inline;
-    font-size: 2em !important;
-    margin: 0px 0px 0px 20px;
+#messengerContent{
+    height: 60vh;
 }
 
-#side-toggler{
-    display: inline;
-    font-size: 2em !important;
-    margin: 0px 0px 0px 20px;
+#convoPanel{
+    height: 51.5vh;
+    overflow-wrap: break-word;
+    overflow: scroll;
 }
 
-#side-logo{
-    font-size: 1.75em;
-    padding: 0px 10px 0px 35px
-    
+.sentMessage{
+    width: 70%;
+    margin: 0 0 0 20%;
+    text-align: right;
 }
 
-#form-modal-content {
-    text-align:center !important;
+.receivedMessage{
+    width: 70%;
+    margin: 0 20% 0 0;
+    text-align: left;
 }
 
-#form-modal-footer {
-    text-align:center !important;
+#convoContainer{
+    height: 30vh;
+    overflow: scroll;
 }
 
-.background{
-    height: 150px !important;
-    padding: 25px 0px 0px 20px;
-    
-}
-
-#sideUser{
-    height: 150px !important;
-    
-}
-
-.user-view{
-    padding-bottom: 15px !important;
-}
-
-#sideNavTitle{
-    height: 64px;
-}
-
-#sideEmail{
-    margin-bottom: 15px !important;
-}
+/*MEDIA QUERIES*/
 
 @media only screen and (max-width: 600px) {
+
     #sideNavTitle{
         height: 56px;
     }
+
   }
