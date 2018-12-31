@@ -526,21 +526,27 @@ var app = {
 
         document.querySelector('#main-content').innerHTML = '';
         document.querySelector('#main-content').innerHTML = messenger;
-        app.displayUsers()
+        app.displayUsers(user)
         //enter key sends message
         document.querySelector('#newMessage').onkeypress = function (e) {
             if (!e) e = window.event;
             var keyCode = e.keyCode || e.which;
             if (keyCode == '13') {
                 // Enter pressed
-                app.createNewMessage(user);
+                var dest = document.querySelector('#convoContainer');
+                var currentConvo = dest.getAttribute('currentconvo');
+                console.log(currentConvo);
+                app.createNewMessage(user, currentConvo);
             }
         }
 
         //register click events
         document.querySelector('#sendMessage').addEventListener('click', function (e) {
             e.preventDefault();
-            app.createNewMessage(user);
+            var dest = document.querySelector('#convoContainer');
+            var currentConvo = dest.getAttribute('currentconvo');
+            console.log(currentConvo);
+            app.createNewMessage(user, currentConvo);
         });
 
         //initiate tabs
@@ -550,7 +556,7 @@ var app = {
         }
 
     },
-    displayUsers: function () {
+    displayUsers: function (user) {
         var target = document.querySelector('#contacts');
         firebase.database().ref('users/').on('child_added', function (snapshot) {
             var data = snapshot.val();
@@ -588,35 +594,258 @@ var app = {
                 currentChatButton.addEventListener('click', function (e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    var userID = this.getAttribute('userID');
+                    var members = [];
+                    members.push(this.getAttribute('userID'));
+                    members.push(user.uid);
+                    console.log(members);
                     console.log('.startChat clicked');
-                    console.log(userID);
+                    console.log(members);
+
+                    app.getConvo(user, members, 'direct');
 
                     var el = document.querySelector('.tabs');
                     var instance = M.Tabs.getInstance(el);
                     instance.select('messages');
 
-
-                    //instance.select('messages');
                 });
             }
 
         });
 
     },
+    getConvo: function (user, members, messageType) {
+        console.log(members);
+        console.log(user.uid);
+        var returnedData;
+        var cMRef = firebase.database().ref("convo-members").orderByChild(user.uid).equalTo(messageType);
+        cMRef.once('value', function (snapshot) {
+            var data = snapshot.val();
+            returnedData = data;
+        }).then(function () {
+            function aMatch() {
+                var keys = Object.keys(returnedData);
+                for (var i = 0; i < keys.length; i++) {
+                    var match = 0;
+                    var currentKey = keys[i];
+                    var convo = returnedData[currentKey];
+                    var convoMembers = Object.keys(convo);
+                    for (var j = 0; j < convoMembers.length; j++) {
+                        var currentConvoAndMember = convoMembers[j];
+                        for (var k = 0; k < members.length; k++) {
+                            var exists = (currentConvoAndMember === members[k]) ? true : false;
+                            if (exists === true) {
+                                match++;
+                            }
+                            if (match == members.length) {
+                                return currentKey;
+                            }
+                        }
+                    }
+                }
+            }
+            var matchFound = aMatch();
+            console.log(matchFound);
+            if (!matchFound) {
+                console.log('no conversations found... better Make a new one!!!');
+                app.createConversation(user, members, messageType);
+            } else {
+                console.log('converstion Found!!!')
+                document.querySelector('#convoContainer').setAttribute('currentConvo', matchFound);
+                
+                app.displayCurrentConvo(user, matchFound);
+            }
+        })
 
-    createNewMessage: function (user) {
+    },
+    createConversation: function (user, members, messageType) {
+        var userID = user.uid;
+        console.log(user);
+        // Get a key for a new Post.
+
+        var root = firebase.database().ref();
+        var newKey = root.push().key;
+        var convoRef = root.child('convos');
+        var convoMembersRef = root.child('convo-members');
+        var userConvos = root.child('convos-' + userID);
+
+        // A convo entry.
+        userConvos.child(newKey).set({ type: messageType });
+        var convoTitle = userID;
+
+        for (var i = 0; i < members.length; i++) {
+            convoTitle += ' ' + members[i];
+        }
+
+        convoRef.child(newKey).set({
+            title: convoTitle
+        });
+
+        for (var i = 0; i < members.length; i++) {
+            var contactsConvos = root.child('convos-' + members[i]);
+            contactsConvos.child(newKey).set({ type: messageType });
+        }
+
+        var convoMembers = {};
+        //swith to only using members and delete this line
+        convoMembers[userID] = messageType;
+
+        for (var i = 0; i < members.length; i++) {
+            convoMembers[members[i]] = messageType;
+        }
+
+        convoMembersRef.child(newKey).set(convoMembers);
+        document.querySelector('#convoContainer').setAttribute('currentConvo', newKey);
+        //display 
+        //app.displayUserConvos(user)
+
+    },
+    displayCurrentConvo: function(user, convoID){
+
+        var convoRef = firebase.database().ref().child('convo-messages').child(convoID);
+        convoRef.orderByChild('timestamp').limitToLast(100).once('value',function(snapshot){
+            var data = snapshot.val();
+            var keys = Object.keys(data);
+            console.log(keys.length);
+            var convoContainer = document.querySelector('#convoContainer');
+            convoContainer.innerHTML = '';
+            for(var i = 0 ; i < keys.length; i++){
+                var currentMessage = data[keys[i]];
+                var message = currentMessage.message;
+                var sender = currentMessage.sender;
+                if(sender === user.uid){
+                    var sentOrReceived = 'sentMessage';
+                } else {
+                    var sentOrReceived = 'receivedMessage';
+                }
+                var timestamp = currentMessage.timestamp;
+                var keepContent = convoContainer.innerHTML;
+                var newContent = `<div class='row'>
+                                    <div class='col sm12 ${sentOrReceived}'>
+                                        
+                                            <div>${message}</div>
+                                            <div>${timestamp}</div>
+                                        
+                                    </div>
+                                  </div>`;
+                convoContainer.innerHTML = '';
+                convoContainer.innerHTML = keepContent + newContent;
+
+            }
+            console.log(data);
+
+        });
+        app.displayUserConvos(user);
+    
+        
+    },
+    displayUserConvos: function (user) {
+        var userConvosRef = firebase.database().ref().child('convos-' + user.uid);
+        userConvosRef.once('value', function (snapshot) {
+            var data = snapshot.val();
+            var userConvos = Object.keys(data);
+            var convoMembers = []
+            console.log(userConvos);
+            var conversations = [];
+            convoPanel.innerHTML = '';
+            for (var i = 0; i < userConvos.length; i++) {
+                var convoInfo = {
+                    updated: 'something',
+                    title: 'something',
+                    lastMessage: 'something',
+                    img: 'something'
+                }
+                var currentConvo = userConvos[i];
+                var currentConvoType = data[currentConvo].type;
+                console.log(currentConvoType);
+                var convosRef = firebase.database().ref().child('convos').child(currentConvo);
+                convosRef.once('value', function (snapshot) {
+                    var data = snapshot.val();
+                    var lastUpdated = data.lastUpdated;
+                    var title = data.title;
+                    convoInfo.updated = lastUpdated;
+                    if(currentConvoType === 'group'){
+                        convoInfo.title = title;
+                    }
+                    if(currentConvoType === 'group'){
+                        convoInfo.img = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
+                    }
+                    console.log(lastUpdated);
+                });//end convosref
+                if(currentConvoType === 'direct'){                 
+                var convoMembersRef = firebase.database().ref().child('convo-members').child(currentConvo);
+                var x = convoMembersRef.once('value', function (snapshot) {
+                    var data = snapshot.val();
+                    var convoMembers = Object.keys(data);
+                    var convoMemberNames = [];
+                    for (var j = 0; j < convoMembers.length; j++) {
+                        var currentMember = convoMembers[j];
+                        if (currentMember === user.uid) { };
+                        if (currentMember !== user.uid) {
+                            convoMemberNames.push(currentMember);
+                        };
+                    } 
+                    convoInfo.title = convoMemberNames[0];
+                    var usersRef = firebase.database().ref().child('users').child(convoMemberNames[0]);
+                    usersRef.once('value', function(snapshot){
+                        var data = snapshot.val();   
+                        convoInfo.img = data.profilePic;
+                        convoInfo.title = data.firstName + ' ' + data.lastName;
+                    });//userRef end
+                    console.log(convoMemberNames);
+                });//end convoMembers ref
+            }
+                var convosMessagesRef = firebase.database().ref().child('convo-messages').child(currentConvo);
+                convosMessagesRef.orderByChild('timestamp').limitToLast(1).once('value', function (snapshot) {
+                    var data = snapshot.val();
+                    var key = Object.keys(data);
+                    var lastMessage = data[key].message;
+                    console.log(lastMessage);
+                    convoInfo.lastMessage = lastMessage;
+                    console.log(convoInfo);
+                    conversations.push(convoInfo);
+                    console.log(conversations);
+                    var convoPanel = document.querySelector('#convoPanel');
+                    var newConvoPreview = `<div id='preview-${currentConvo}' class=row>
+                                            <div class='col s4'>
+                                                <img src='${convoInfo.img}' class='responsive-img circle'/>
+                                            </div>
+                                            <div class='col s8'>
+                                                <div>${convoInfo.title}</div>
+                                                <div>${convoInfo.lastMessage}</div>
+                                            </div> 
+                                           </div>`;
+                    var keepContent = convoPanel.innerHTML;
+                    convoPanel.innerHTML = '';
+                    convoPanel.innerHTML = keepContent + newConvoPreview;
+                    
+                });// endconvosMessagesRef
+            }
+        })//end userconvosRef
+       
+
+    },
+    createNewMessage: function (user, currentConvo) {
         console.log(user);
         var newMessage = document.querySelector('#newMessage').value;
-        var message = `<div class='sentMessage'>${newMessage}</div>`;
-        var convo = document.querySelector('#convoContainer');
-        var conversation = convo.innerHTML;
-        convo.innerHTML = conversation + message;
-
-
+        var newKey = firebase.database().ref().push().key;
+        var convosRef = firebase.database().ref().child('convos');
+        var currentTimestamp = firebase.database.ServerValue.TIMESTAMP;
+        var currentConvoRef = convosRef.child(currentConvo);
+        currentConvoRef.child('lastUpdated').set(currentTimestamp);
+        var convosMessagesRef = firebase.database().ref().child('convo-messages').child(currentConvo);
+        convosMessagesRef.child(newKey).set({
+            message: newMessage,
+            sender: user.uid,
+            timestamp: currentTimestamp,
+        });
+        //app.displayUserConvos(user);
+        // var message = `<div class='sentMessage'>${newMessage}</div>`;
+        // var convo = document.querySelector('#convoContainer');
+        // var conversation = convo.innerHTML;
+        // convo.innerHTML = conversation + message;
+        app.displayCurrentConvo(user, currentConvo);
         document.querySelector('#newMessage').value = '';
     },
-
     signInForm: function () {
         console.log('signInForm start running');
         //create sign in form content
