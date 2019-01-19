@@ -87,24 +87,51 @@ i.icon-light {
     
 }
 
+/* #passInput1Col1{
+    padding: 0!important;
+} */
+
 #passCollapse{
     border:none!important;
+    
 }
 #passCollapse-header{
     border:none!important;
+    padding: none;
+    margin: none;
 }
 #passCollapse-body{
     border:none!important;
+    padding: none;
+    margin: none;
 }
 
 .acctField{
-    width: 100%;
+    width: 95%;
     margin-bottom: 0;
+    
 }
 
 #addNewPass{
     width: 40px!important;
     margin: 0!important;
+}
+
+#addanewpassword{
+    margin: 0!important;
+}
+
+#nameIcon{
+    margin-top: 1.75em!important;
+}
+
+#inputFName{
+    padding-left: 1em;
+}
+
+#addanewpasswordCol{
+    
+    padding: 0!important;
 }
 
 #acctInfoCont{
@@ -152,6 +179,33 @@ i.icon-light {
 #convoContainer{
     height: 30vh;
     overflow: scroll;
+}
+
+.autocomplete-items{
+    border: solid;
+    border-width: 0px 1px 1px 1px;
+}
+.autocomplete-item{
+    border: solid;
+    border-width: 1px 0px 0px 0px;
+    padding: 0.5em;
+
+}
+
+.autocomplete-item:hover {
+    background-color: #e9e9e9; 
+  }
+
+.autocomplete-item-active {
+    background-color: DodgerBlue !important; 
+    color: #ffffff; 
+  }
+
+.autocomplete-item-name{
+    font-size: 1em;
+}
+.autocomplete-item-email{
+    font-size: 0.75em;
 }
 
 /*MEDIA QUERIES*/

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/5.7.3/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAurf4I6crcvlNfcn0WMpvhTp1fOr0aegQ",
+            authDomain: "userauth-ba42b.firebaseapp.com",
+            databaseURL: "https://userauth-ba42b.firebaseio.com",
+            projectId: "userauth-ba42b",
+            storageBucket: "userauth-ba42b.appspot.com",
+            messagingSenderId: "33064953031"
+        };
+        firebase.initializeApp(config);
+    </script>
+</head>
+
+<body>
+
+    <h2>Autocomplete</h2>
+
+    <p>Start typing:</p>
+
+    <!--Make sure the form has the autocomplete function switched off:-->
+    <form autocomplete="off" action="/action_page.php">
+        <div class="autocomplete" style="width:300px;">
+            <input id="myInput" type="text" name="myCountry" placeholder="Country">
+        </div>
+        <input type="submit">
+    </form>
+
+    <script>
+
+
+        var userAutoComplete = [];
+
+
+        function autocomplete(input, arr) {
+            var currentFocus;
+            input.addEventListener("input", function (e) {
+                var autoCompleteList, autoCompleteItem, i, val = this.value;
+                //add close all lists
+                closeAllLists();
+                if (!val) { return false; };
+                currentFocus = -1;
+                autoCompleteList = document.createElement("DIV");
+                autoCompleteList.setAttribute("id", this.id + "autocomplete-list");
+                autoCompleteList.setAttribute("class", "autocomplete-items");
+                this.parentNode.appendChild(autoCompleteList);
+                for (i = 0; i < arr.length; i++) {
+                    console.log(arr[i].name);
+                    if (arr[i].name.substr(0, val.length).toUpperCase() == val.toUpperCase() || arr[i].email.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                        autoCompleteItem = document.createElement("DIV");
+                        autoCompleteItem.innerHTML = "<strong>" + arr[i].name.substr(0, val.length) + "</strong>";
+                        autoCompleteItem.innerHTML += arr[i].name.substr(val.length);
+                        autoCompleteItem.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                        autoCompleteItem.addEventListener("click", function (e) {
+                            input.value = this.getElementsByTagName("input")[0].value;
+                            closeAllLists();
+                        });
+                        autoCompleteList.appendChild(autoCompleteItem);
+                    }
+                }
+            });
+
+            input.addEventListener("keydown", function (e) {
+                var autocompleteListItem = document.getElementById(this.id + "autocomplete-list");
+                if (autocompleteListItem) autocompleteListItem = autocompleteListItem.getElementsByTagName("div");
+                if (e.keyCode == 40) {
+                    /*If the arrow DOWN key is pressed,
+                    increase the currentFocus variable:*/
+                    currentFocus++;
+                    /*and and make the current item more visible:*/
+                    addActive(autocompleteListItem);
+                } else if (e.keyCode == 38) { //up
+                    /*If the arrow UP key is pressed,
+                    decrease the currentFocus variable:*/
+                    currentFocus--;
+                    /*and and make the current item more visible:*/
+                    addActive(autocompleteListItem);
+                } else if (e.keyCode == 13) {
+                    /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                    e.preventDefault();
+                    if (currentFocus > -1) {
+                        /*and simulate a click on the "active" item:*/
+                        if (autocompleteListItem) autocompleteListItem[currentFocus].click();
+                    }
+                }
+            });
+
+
+            function closeAllLists(elem) {
+                /*close all autocomplete lists in the document,
+                except the one passed as an argument:*/
+                var autoCompleteList = document.getElementsByClassName("autocomplete-items");
+                for (var i = 0; i < autoCompleteList.length; i++) {
+                    if (elem != autoCompleteList[i] && elem != input) {
+                        autoCompleteList[i].parentNode.removeChild(autoCompleteList[i]);
+                    }
+                }
+            }
+
+
+            function addActive(autoCompleteItem) {
+                /*a function to classify an item as "active":*/
+                if (!autoCompleteItem) return false;
+                /*start by removing the "active" class on all items:*/
+                removeActive(autoCompleteItem);
+                if (currentFocus >= autoCompleteItem.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = (autoCompleteItem.length - 1);
+                /*add class "autocomplete-active":*/
+                autoCompleteItem[currentFocus].classList.add("autocomplete-active");
+            }
+
+            function removeActive(autoCompleteItem) {
+                /*a function to remove the "active" class from all autocomplete items:*/
+                for (var i = 0; i < autoCompleteItem.length; i++) {
+                    autoCompleteItem[i].classList.remove("autocomplete-active");
+                }
+            }
+
+            document.addEventListener("click", function (e) {
+                closeAllLists(e.target);
+            });
+        }
+
+
+
+
+
+
+
+
+
+        function getUserData() {
+            var usersRef = firebase.database().ref().child('users');
+            usersRef.on('value', function (snap) {
+                var response = snap.val();
+                var keys = Object.keys(response);
+                console.log(keys);
+                for (var i = 0; i < keys.length; i++) {
+                    var key = keys[i];
+                    var currrentKey = response[keys[i]];
+                    var currentName = `${currrentKey.firstName} ${currrentKey.lastName}`;
+                    var currentEmail = currrentKey.email;
+                    console.log(currentName);
+                    var data = {
+                        'userID': key,
+                        'name': currentName,
+                        'email': currentEmail
+                    }
+                    userAutoComplete.push(data);
+                }
+                autocomplete(document.getElementById("myInput"), userAutoComplete);
+                console.log(userAutoComplete);
+            });
+        }
+        getUserData();
+
+
+
+    </script>
+
+</body>
+
+</html>
