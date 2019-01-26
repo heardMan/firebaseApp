@@ -1,5 +1,4 @@
 var app = {
-    defaultPhoto: 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg',
     state: {
         currentPage: null,
     },
@@ -46,7 +45,9 @@ var app = {
         var name = user.displayName;
         var email = user.email;
 
-        var photoUrl = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
+        
+
+        
 
         // if (emailVerified === false) {
         //     console.log('user Not Verified');
@@ -74,7 +75,7 @@ var app = {
             document.querySelector('#nav-items').innerHTML = navMyAccount + navItems + navSignOut;
             var sideNavItems = document.querySelector('#slide-out').innerHTML;
             var sideSignOut = `<li id='sideSignOut'><a href='#' class='signOut'>Sign Out</a></li>`;
-            var userImg = `<a href='#'><img class='circle' src='${photoUrl}'/></a>`;
+            var userImg = `<a href='#'><img id='sidNavUserImg' class='circle' src=''/></a>`;
             var userName = `<a href='#'><span class='white-text name'>${name}</span></a>`;
             var userEmail = `<a id='sideEmail'  href='#'><span class='white-text email'>${email}</span></a>`;
             var userView = `<div class='user-view'><div class='background blue darken-3'>${userImg + userName + userEmail}</div></div>`;
@@ -82,6 +83,8 @@ var app = {
             var sideNavMyAccount = `<li id='sideNavMyAccount'><a href='#' class='myAccount'>My Account</a></li>`;
             var messages = `<li id='userMessages'><a href='#' class='myMessages'>Messenger</a></li>`;
             document.querySelector('#slide-out').innerHTML = sideUser + sideNavMyAccount + messages + sideNavItems + sideSignOut;
+            
+            app.getprofilePic(sidNavUserImg);
             //register click events
             var myAccount = document.querySelectorAll('.myAccount');
             for (var i = 0; i < myAccount.length; i++) {
@@ -99,7 +102,6 @@ var app = {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('.signOut clicked');
-
                     app.logOut(user);
                 });
             }
@@ -107,7 +109,7 @@ var app = {
             userMessages.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                messenger.init();
+                messenger.init(user);
                 //app.messenger(user);
             });
         });
@@ -150,7 +152,8 @@ var app = {
         }
         console.log('loggedOutUI end running');
     },
-    findUserAutoComplete: function () {
+
+    findUserAutoComplete: function (user) {
         var userAutoComplete = [];
         var usersRef = firebase.database().ref().child('users');
         usersRef.on('value', function (snap) {
@@ -158,36 +161,45 @@ var app = {
             var keys = Object.keys(response);
             console.log(keys);
             for (var i = 0; i < keys.length; i++) {
-                var key = keys[i];
+                var userkey = keys[i];
                 var currrentKey = response[keys[i]];
                 var currentName = `${currrentKey.firstName} ${currrentKey.lastName}`;
                 var currentEmail = currrentKey.email;
-                console.log(currentName);
+                console.log(userkey);
+
                 var data = {
-                    'userID': key,
+                    'userID': userkey,
                     'name': currentName,
                     'email': currentEmail
                 }
+
+                console.log(data);
                 userAutoComplete.push(data);
+
             }
             var findUser = document.querySelector("#findUser");
-            app.userautocomplete(findUser, userAutoComplete);
+            
+            app.userautocomplete(user, findUser, userAutoComplete);
             console.log(userAutoComplete);
+            
         });
     },
-
-    userautocomplete: function (inp, arr) {
+    
+    userautocomplete: function (user, inp, arr) {
         /*the autocomplete function takes two arguments,
         the text field element and an array of possible autocompleted values:*/
         var currentFocus;
+        console.log(user);
+        
         /*execute a function when someone writes in the text field:*/
         inp.addEventListener("input", function (e) {
-            var a, b, c, d, i, val = this.value;
+            var a, b, c, d, e, f, g, h, i, q, t, val = this.value;
             /*close any already open lists of autocompleted values*/
             closeAllLists();
             if (!val) { return false; }
             currentFocus = -1;
             /*create a DIV element that will contain the items (values):*/
+            
             a = document.createElement("DIV");
             a.setAttribute("id", this.id + "autocomplete-list");
             a.setAttribute("class", "autocomplete-items");
@@ -199,25 +211,51 @@ var app = {
                 if (arr[i].name.substr(0, val.length).toUpperCase() == val.toUpperCase() || arr[i].email.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
                     /*create a DIV element for each matching element:*/
                     b = document.createElement("DIV");
+                    //console.log(arr[i].userID);
+                    b.setAttribute("id", "acListItem"+arr[i].userID);
+                    b.setAttribute("dataID", arr[i].userID);
+                    
                     b.setAttribute("class", "autocomplete-item");
+
                     c = document.createElement("DIV");
-                    c.innerHTML = "<strong>" + arr[i].name.substr(0, val.length) + "</strong>";
-                    c.innerHTML += arr[i].name.substr(val.length);
-                    c.setAttribute("class", "autocomplete-item-name");
-                    /*insert a input field that will hold the current array item's value:*/
-                    c.innerHTML += "<input type='hidden' value='" + arr[i].name + "'>";
-                    
-                    
-                    b.appendChild(c);
+                    c.setAttribute("class", "row autocomplete-item-row");
+                    b.append(c);
 
                     d = document.createElement("DIV");
-                    d.innerHTML = "<strong>" + arr[i].name.substr(0, val.length) + "</strong>";
-                    d.innerHTML += arr[i].email.substr(val.length);
-                    d.setAttribute("class", "autocomplete-item-email");
-                    /*insert a input field that will hold the current array item's value:*/
-                    d.innerHTML += "<input type='hidden' value='" + arr[i].email + "'>";
-                    b.appendChild(d);
+                    d.setAttribute("class", "col s5");
+                    e = document.createElement("DIV");
+                    e.setAttribute("class", "col s7");
 
+                    c.append(d);
+                    c.append(e);
+                    
+                    f = document.createElement("IMG");
+                    f.setAttribute("class", "responsive-img");
+                    f.setAttribute("id", "userImg-"+arr[i].userID);
+
+                    app.getprofilePic(f);
+
+                    d.append(f);
+
+                    q = document.createElement("DIV");
+                    q.innerHTML = "<strong>" + arr[i].name.substr(0, val.length) + "</strong>";
+                    q.innerHTML += arr[i].name.substr(val.length);
+                    q.setAttribute("class", "autocomplete-item-name");
+                    /*insert a input field that will hold the current array item's value:*/
+                    q.innerHTML += "<input type='hidden' value='" + arr[i].name + "'>";
+                    e.append(q);
+                   
+                    //b.appendChild(q);
+
+                    t = document.createElement("DIV");
+                    t.innerHTML = "<strong>" + arr[i].name.substr(0, val.length) + "</strong>";
+                    t.innerHTML += arr[i].email.substr(val.length);
+                    t.setAttribute("class", "autocomplete-item-email");
+                    /*insert a input field that will hold the current array item's value:*/
+                    t.innerHTML += "<input type='hidden' value='" + arr[i].email + "'>";
+                    //b.appendChild(t);
+                    e.append(t);
+                    
 
                     /*make the matching letters bold:*/
                     //b.innerHTML = "<strong>" + arr[i].name.substr(0, val.length) + "</strong>";
@@ -225,10 +263,14 @@ var app = {
                     /*insert a input field that will hold the current array item's value:*/
                     //b.innerHTML += "<input type='hidden' value='" + arr[i].name + "'>";
                     /*execute a function when someone clicks on the item value (DIV element):*/
-
+                    
                     b.addEventListener("click", function (e) {
                         /*insert the value for the autocomplete text field:*/
                         inp.value = this.getElementsByTagName("input")[0].value;
+                        var userID = this.getAttribute("dataID");
+
+                        inp.setAttribute("dataID", userID);
+                        
                         /*close the list of autocompleted values,
                         (or any other open lists of autocompleted values:*/
                         closeAllLists();
@@ -296,284 +338,7 @@ var app = {
         });
     },
 
-    displayUsers: function (user) {
-        var target = document.querySelector('#contacts');
-        firebase.database().ref('users/').on('child_added', function (snapshot) {
-            var data = snapshot.val();
-
-            var priorContent = target.innerHTML;
-            var img = data.profilePic;
-            var nameData = data.firstName + ' ' + data.lastName;
-            var name = `<div>${nameData}</div>`;
-            console.log(data);
-            if (data.online === 'true') {
-                var onlineStatus = `<div class='green-text'>Online</div>`;
-                var chatButton = `<div><a id='chat${data.userID}' userID='${data.userID}' class="chatButton btn-floating btn-large waves-effect waves-light green"><i class="material-icons">message</i></a></div>`;
-            } else {
-                var onlineStatus = `<div class='red-text'>Offline</div>`;
-                var chatButton = `<div><a id='chat${data.userID}' userID='${data.userID}' class="chatButton btn-floating btn-large waves-effect waves-light red"><i class="material-icons">message</i></a></div>`;
-            }
-
-            //var signedIn = `<div class='red-text'>Offline</div>`;
-            var newContent = `<div id='' class='row'>
-                                <div class='col s4'>
-                                    <img class='circle responsive-img' src='${img}'>
-                                </div>
-                                <div class='col s8'>
-                                    ${name + onlineStatus + chatButton}
-                                    
-                                </div>
-                              </div>`;
-            target.innerHTML = priorContent + newContent;
-
-            var startChat = document.querySelectorAll('.chatButton');
-            console.log(startChat.length);
-            for (var i = 0; i < startChat.length; i++) {
-                var currentChatButton = startChat[i];
-                console.log(currentChatButton);
-                currentChatButton.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    var members = [];
-                    members.push(this.getAttribute('userID'));
-                    members.push(user.uid);
-                    console.log(members);
-                    console.log('.startChat clicked');
-                    console.log(members);
-
-                    app.getConvo(user, members, 'direct');
-
-
-                    var el = document.querySelector('.tabs');
-                    var instance = M.Tabs.getInstance(el);
-                    instance.select('messages');
-
-                });
-            }
-
-        });
-
-    },
-    getConvo: function (user, members, messageType) {
-        console.log(members);
-        console.log(user.uid);
-        var returnedData;
-        var cMRef = firebase.database().ref("convo-members").orderByChild(user.uid).equalTo(messageType);
-        cMRef.once('value', function (snapshot) {
-            var data = snapshot.val();
-            returnedData = data;
-            if (returnedData === null) {
-                returnedData = 'no convo yet';
-            }
-        }).then(function () {
-            function aMatch() {
-                var keys = Object.keys(returnedData);
-                for (var i = 0; i < keys.length; i++) {
-                    var match = 0;
-                    var currentKey = keys[i];
-                    var convo = returnedData[currentKey];
-                    var convoMembers = Object.keys(convo);
-                    for (var j = 0; j < convoMembers.length; j++) {
-                        var currentConvoAndMember = convoMembers[j];
-                        for (var k = 0; k < members.length; k++) {
-                            var exists = (currentConvoAndMember === members[k]) ? true : false;
-                            if (exists === true) {
-                                match++;
-                            }
-                            if (match == members.length) {
-                                return currentKey;
-                            }
-                        }
-                    }
-                }
-            }
-            var matchFound = aMatch();
-            console.log(matchFound);
-            if (!matchFound) {
-                console.log('no conversations found... better Make a new one!!!');
-                app.createConversation(user, members, messageType);
-            } else {
-                console.log('converstion Found!!!')
-                document.querySelector('#convoContainer').setAttribute('currentConvo', matchFound);
-
-                app.displayCurrentConvo(user, matchFound);
-
-            }
-        })
-
-    },
-    createConversation: function (user, members, messageType) {
-        var userID = user.uid;
-        console.log(user);
-        // Get a key for a new Post.
-
-        var root = firebase.database().ref();
-        var newKey = root.push().key;
-        var convoRef = root.child('convos');
-        var convoMembersRef = root.child('convo-members');
-        var userConvos = root.child('convos-' + userID);
-
-        // A convo entry.
-        userConvos.child(newKey).set({ type: messageType, });
-        var convoTitle = userID;
-
-        for (var i = 0; i < members.length; i++) {
-            convoTitle += ' ' + members[i];
-        }
-
-        convoRef.child(newKey).set({
-            title: convoTitle,
-            type: messageType
-        });
-        var timeStamp = firebase.database.ServerValue.TIMESTAMP;
-        for (var i = 0; i < members.length; i++) {
-            var contactsConvos = root.child('convos-' + members[i]);
-            contactsConvos.child(newKey).set({ type: messageType, timestamp: timeStamp });
-        }
-
-        var convoMembers = {};
-        //swith to only using members and delete this line
-        convoMembers[userID] = messageType;
-
-
-        for (var i = 0; i < members.length; i++) {
-            convoMembers[members[i]] = messageType;
-        }
-
-        convoMembersRef.child(newKey).set(convoMembers);
-        document.querySelector('#convoContainer').setAttribute('currentConvo', newKey);
-        //display 
-        //app.displayUserConvos(user)
-        app.displayCurrentConvo(user, newKey);
-
-    },
-    displayCurrentConvo: function (user, convoID) {
-        console.log('display convo has run')
-        var convoContainer = document.querySelector('#convoContainer');
-        convoContainer.innerHTML = '';
-        var convoRef = firebase.database().ref().child('convo-messages').child(convoID);
-        convoRef.orderByChild('timestamp').limitToLast(20).on('child_added', function (snapshot) {
-            var data = snapshot.val();
-            var message = data.message;
-            var senderID = data.sender;
-            var userID = user.uid;
-            var sntORrcvd = senderID === userID ? 'sentMessage' : 'receivedMessage';
-            var timestamp = data.timestamp;
-            var prevMessages = convoContainer.innerHTML;
-            var nextMessage = `<div class='row'>
-                                <div class='col s-12 ${sntORrcvd}'>${message}</div> 
-                               </div>`;
-
-            convoContainer.innerHTML = prevMessages + nextMessage;
-        });
-
-
-
-    },
-    displayUserConvos: function (user) {
-        console.log('display user convos running');
-        console.log(user.uid);
-        var userConvos = firebase.database().ref().child('convos-' + user.uid);
-        userConvos.on('child_added', function (snap) {
-            var data = snap.val();
-            console.log(data);
-            var convoID = snap.key;
-            var convoPanel = document.querySelector('#convoPanel');
-            var keepContent = convoPanel.innerHTML;
-            var newConvoPreview = `<div class='row' id='${snap.key}'></div>`;
-            convoPanel.innerHTML = newConvoPreview + keepContent;
-
-            console.log(data.type);
-            if (data.type === 'direct') {
-                var convoTitleRef = firebase.database().ref().child('convo-members').child(snap.key);
-                convoTitleRef.on('value', function (snap) {
-                    var data = snap.val();
-                    console.log(data);
-                    var keys = Object.keys(data);
-                    if (keys[0] === user.uid) {
-                        console.log('match');
-                        var getTitleRef = firebase.database().ref().child('users').child(keys[1]);
-                        getTitleRef.on('value', function (snap) {
-                            var data = snap.val();
-                            var convoTitle = `<div>${data.firstName} ${data.lastName}</div>`;
-                            var currentPreviewContainer = document.querySelector('#' + convoID);
-                            currentPreviewContainer.innerHTML = convoTitle;
-                            console.log(convoID);
-
-                            var lastMessageRef = firebase.database().ref().child('convo-messages').child(convoID);
-                            lastMessageRef.on('child_added', function (snap) {
-                                var key = snap.key;
-                                var data = snap.val();
-
-
-                                console.log(data);
-                                console.log(data.message);
-
-
-                                var lastMessage = `<div>${data.message}</div>`
-
-                                var keepContent = currentPreviewContainer.innerHTML;
-                                currentPreviewContainer.innerHTML = keepContent + lastMessage
-                            })
-
-                        });
-                    } else {
-                        console.log('not match');
-                        console.log('match');
-                        var getTitleRef = firebase.database().ref().child('users').child(keys[0]);
-                        getTitleRef.on('value', function (snap) {
-                            var data = snap.val();
-                            var convoTitle = `<div>${data.firstName} ${data.lastName}</div>`;
-                            var currentPreviewContainer = document.querySelector('#' + convoID);
-                            currentPreviewContainer.innerHTML = convoTitle;
-                            console.log(convoID);
-
-                            var lastMessageRef = firebase.database().ref().child('convo-messages').child(convoID).limitToLast(1);
-                            lastMessageRef.on('child_added', function (snap) {
-                                var data = snap.val();
-                                console.log(data);
-                                console.log(data.message);
-                                var lastMessage = `<div>${data.message}</div>`
-                                var keepContent = currentPreviewContainer.innerHTML;
-                                currentPreviewContainer.innerHTML = keepContent + lastMessage
-                            })
-
-                        });
-                    }
-                    document.querySelector(`#${convoID}`).addEventListener('click', function (e) {
-                        e.preventDefault();
-                        app.displayCurrentConvo(user, convoID);
-
-                    });
-
-                });
-            } else {
-                console.log('group messaging not yet supported')
-            }
-
-        })
-
-    },
-    createNewMessage: function (user, currentConvo) {
-        console.log(user);
-        var newMessage = document.querySelector('#newMessage').value;
-        var newKey = firebase.database().ref().push().key;
-        var convosRef = firebase.database().ref().child('convos');
-        var currentTimestamp = firebase.database.ServerValue.TIMESTAMP;
-        var currentConvoRef = convosRef.child(currentConvo);
-        currentConvoRef.child('lastUpdated').set(currentTimestamp);
-        var convosMessagesRef = firebase.database().ref().child('convo-messages').child(currentConvo);
-        convosMessagesRef.child(newKey).set({
-            message: newMessage,
-            sender: user.uid,
-            timestamp: currentTimestamp,
-        });
-        var userConvosRef = firebase.database().ref().child('convos-' + user.uid).child(currentConvo).child('timestamp');
-        userConvosRef.set(currentTimestamp);
-
-        // app.displayCurrentConvo(user, currentConvo);
-        document.querySelector('#newMessage').value = '';
-    },
+   
     signInForm: function () {
         console.log('signInForm start running');
         //create sign in form content
@@ -729,9 +494,11 @@ var app = {
                 console.log("got the user");
                 console.log(user.user.uid);
                 var uid = user.user.uid;
-                function createNewProfile(uid, userEmail) {
+                var defaultPhoto = 'https://firebasestorage.googleapis.com/v0/b/userauth-ba42b.appspot.com/o/defaultImages%2FdefaultUser.jpg?alt=media&token=8cd70e98-8f71-4e28-aba8-25fc1da2c292';
+                user.photoURL = defaultPhoto;
+                function createNewProfile(uid, userEmail, defaultPhoto) {
                     // A post entry.
-                    var defaultPhoto = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
+                    
                     var userData = {
                         userID: uid,
                         profilePic: defaultPhoto,
@@ -745,9 +512,9 @@ var app = {
                     updates['/users/' + uid] = userData;
                     return firebase.database().ref().update(updates);
                 }
-                createNewProfile(uid, email);
+                createNewProfile(uid, email, defaultPhoto);
 
-
+                
 
             })
             .catch(function (error) {
@@ -761,6 +528,21 @@ var app = {
         document.querySelector('#newUserEmail').value = '';
         console.log('createUser end running');
 
+    },
+    getprofilePic: function(dest){
+        
+            var storageRef = firebase.storage().ref('defaultImages/');
+            
+            storageRef.child('defaultUser.jpg').getDownloadURL().then(function(url) {
+                
+                
+                dest.setAttribute("src", url);
+                //document.querySelector("#userImg-"+arr[i].userID).src = test;
+   
+            }).catch(function(error) {
+   
+            });
+        
     },
     deleteUser: function (user) {
         console.log('deleteUser start running');

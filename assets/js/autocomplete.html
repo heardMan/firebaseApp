@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -83,6 +83,8 @@ input[type=submit] {
 
 <body>
 
+    <img id="myimg" height="125px" width="200px">
+
     <h2>Autocomplete</h2>
 
     <p>Start typing:</p>
@@ -95,7 +97,24 @@ input[type=submit] {
         <input type="submit">
     </form>
 
+    <input type="text" id="tag">
+
     <script>
+        var zz = `<div style="background-color: blue">test</div>`;
+        $("#tag").html(zz);
+
+        function showimage() {
+            var storageRef = firebase.storage().ref();
+            var spaceRef = storageRef.child('defaultImages/defaultUser.jpg');
+            storageRef.child('defaultImages/defaultUser.jpg').getDownloadURL().then(function (url) {
+                var test = url;
+
+                document.querySelector('img').src = test;
+
+            }).catch(function (error) {
+            });
+        }
+        showimage();
 
         function autocomplete(inp, arr) {
             /*the autocomplete function takes two arguments,
@@ -195,7 +214,7 @@ input[type=submit] {
             });
         }
         /*An array containing all the country names in the world:*/
-        
+
         /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
         function findUserAutoCoomplete() {
             var userAutoComplete = [];

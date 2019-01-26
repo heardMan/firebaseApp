@@ -2,16 +2,11 @@ var accountSettings = {
     UI: function (data) {
 
         console.log('accountPage start running');
-        var profilePic;
+        
         var user = firebase.auth().currentUser;
         console.log(user.photoURL);
-        if (user.photoURL === null) {
-
-            profilePic = 'https://articles-images.sftcdn.net/wp-content/uploads/sites/3/2016/01/wallpaper-for-facebook-profile-photo.jpg';
-        } else {
-            profilePic = user.photoURL;
-        }
-
+        
+        
         var inputFName = `<div id='inputFName' class='input-field col s6'>
                                 
                                 <input disabled id='yourFirstName' type='text' class='validate' placeholder='${data.firstName}'>
@@ -74,6 +69,7 @@ var accountSettings = {
                                  </div>`;
 
         var acctInfoEmail = `<div class='row acctField'>
+                                <div id="nameIcon" class='col s1 center'><i  class='small material-icons'>account_circle</i></div>
                                     <div class='col s10'>${inputEmail}</div>
                                     <div class='col s1 center'>${editEmail}</div>
                                  </div>`;
@@ -111,7 +107,7 @@ var accountSettings = {
 
         var profilePicCard = `<div class='card'>
                                     <div class='card-image'>
-                                        <img src='${profilePic}'/>
+                                        <img id='profilePicCardImage' src=''/>
                                     </div>
                                   </div>`;
 
@@ -128,6 +124,7 @@ var accountSettings = {
 
         document.querySelector('#main-content').innerHTML = '';
         document.querySelector('#main-content').innerHTML = accountPanel;
+        app.getprofilePic(profilePicCardImage);
         //register click events
         
         //name
