@@ -323,7 +323,12 @@ var messenger = {
             var convoID = snap.key;
             var convoPanel = document.querySelector('#convoPanel');
             var keepContent = convoPanel.innerHTML;
-            var newConvoPreview = `<div class='row' id='${snap.key}'></div>`;
+            var newConvoPreview = `<div class='row' id='${snap.key}'>
+                                    <div id="convoImg-${snap.key}" class="col s4">
+                                        <img id="convoImg-${convoID}">
+                                    </div>
+                                    <div id="convoInfo-${snap.key}" class="col s8"></div>
+                                    </div>`;
             convoPanel.innerHTML = newConvoPreview + keepContent;
 
             console.log(data.type);
@@ -339,9 +344,9 @@ var messenger = {
                         getTitleRef.on('value', function (snap) {
                             var data = snap.val();
                             var convoTitle = `<div>${data.firstName} ${data.lastName}</div>`;
-                            var currentPreviewContainer = document.querySelector('#' + convoID);
+                            var currentPreviewContainer = document.querySelector("#convoInfo-"+convoID);
                             currentPreviewContainer.innerHTML = convoTitle;
-                            console.log(convoID);
+                            console.log(currentPreviewContainer);
                             var keepContent = currentPreviewContainer.innerHTML;
                             var lastMessageRef = firebase.database().ref().child('convo-messages').child(convoID);
                             lastMessageRef.limitToLast(1).on('child_added', function (snap) {
@@ -357,17 +362,19 @@ var messenger = {
                                 
                                
                                 currentPreviewContainer.innerHTML = keepContent + lastMessage
-                            })
+                            });
+
 
                         });
                     } else {
                         console.log('not match');
                         console.log('match');
+                        
                         var getTitleRef = firebase.database().ref().child('users').child(keys[0]);
                         getTitleRef.on('value', function (snap) {
                             var data = snap.val();
                             var convoTitle = `<div>${data.firstName} ${data.lastName}</div>`;
-                            var currentPreviewContainer = document.querySelector('#' + convoID);
+                            var currentPreviewContainer = document.querySelector("#convoInfo-"+convoID);
                             currentPreviewContainer.innerHTML = convoTitle;
                             console.log(convoID);
                             var keepContent = currentPreviewContainer.innerHTML;
