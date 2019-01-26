@@ -1,15 +1,15 @@
 var messenger = {
-    UI: function(user){
-        
-            
-    
-            var conversations = `<div id="conversations">
+    UI: function (user) {
+
+
+
+        var conversations = `<div id="conversations">
                                 
                             </div>`;
-    
-            var convoPanel = `<div id='convoPanel' class='card-panel teal'></div>`;
-    
-            var messageInput = `<div class='row'>
+
+        var convoPanel = `<div id='convoPanel' class='card-panel teal'></div>`;
+
+        var messageInput = `<div class='row'>
     
                                     <div class="input-field col s9">
                                         <input placeholder="Send a Message" id="newMessage" type="text" class="validate">
@@ -19,20 +19,20 @@ var messenger = {
                                         <a id='sendMessage' class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">send</i></a>
                                     </div>
                                 </div>`;
-    
-            var openConvo = `<div id='openConvo' class='card'>
+
+        var openConvo = `<div id='openConvo' class='card'>
                                 <div id='convoContainer' class="card-content black-text" currentconvo='blank'></div>
                                 <div class="card-action">${messageInput}</div>
                              </div>`;
-    
-            var messages = `<div id="messages">
+
+        var messages = `<div id="messages">
                                 <div class='row'>
                                     <div class='col m4 hide-on-small-only'>${convoPanel}</div>
                                     <div class='col s12 m8'>${openConvo}</div>
                                 </div>
                             </div>`;
-    
-            var messengerElem = `<div id='messenger' class='row'>
+
+        var messengerElem = `<div id='messenger' class='row'>
                                 <div class='col s12'>
                                     <div class='card'>
                                         <div class='card-content'>
@@ -70,71 +70,71 @@ var messenger = {
                                     </div>
                                 </div>
                             </div>`;
-    
-            document.querySelector('#main-content').innerHTML = '';
-            document.querySelector('#main-content').innerHTML = messengerElem;
-            messenger.displayUsers(user);
-            messenger.displayUserConvos(user);
 
-            //autocomplete chat button
-            var aCChatBtn = document.querySelector("#aCChatBtn");
-            aCChatBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                var autoComplete = document.querySelector("#findUser");
-                console.log(autoComplete.getAttribute("dataID"));
-                var userID = autoComplete.getAttribute("dataID");
-                var members = [userID, user.uid];
-                console.log(members);
-                messenger.getConvo(user, members, "direct");
-                //messenger.displayCurrentConvo(user, convoID);
-                //var convoRef = firebase.database().ref();
+        document.querySelector('#main-content').innerHTML = '';
+        document.querySelector('#main-content').innerHTML = messengerElem;
+        messenger.displayUsers(user);
+        messenger.displayUserConvos(user);
 
-                var messageTab = document.querySelector("#messagesTabLink");
-                var messageTabStatus = messageTab.getAttribute("class");
+        //autocomplete chat button
+        var aCChatBtn = document.querySelector("#aCChatBtn");
+        aCChatBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var autoComplete = document.querySelector("#findUser");
+            console.log(autoComplete.getAttribute("dataID"));
+            var userID = autoComplete.getAttribute("dataID");
+            var members = [userID, user.uid];
+            console.log(members);
+            messenger.getConvo(user, members, "direct");
+            //messenger.displayCurrentConvo(user, convoID);
+            //var convoRef = firebase.database().ref();
 
-                console.log(messageTabStatus);
+            var messageTab = document.querySelector("#messagesTabLink");
+            var messageTabStatus = messageTab.getAttribute("class");
 
-                if(messageTabStatus !== "active"){
-                    var el = document.querySelector('.tabs');
-                    var instance = M.Tabs.getInstance(el);
-                    instance.select('messages');
-                }
-                
-                
+            console.log(messageTabStatus);
 
-
-            });
-            
-            //enter key sends message
-            document.querySelector('#newMessage').onkeypress = function (e) {
-                if (!e) e = window.event;
-                var keyCode = e.keyCode || e.which;
-                if (keyCode == '13') {
-                    // Enter pressed
-                    var dest = document.querySelector('#convoContainer');
-                    var currentConvo = dest.getAttribute('currentconvo');
-                    console.log(currentConvo);
-                    messenger.createNewMessage(user, currentConvo);
-                }
+            if (messageTabStatus !== "active") {
+                var el = document.querySelector('.tabs');
+                var instance = M.Tabs.getInstance(el);
+                instance.select('messages');
             }
-    
-            //register click events
-            document.querySelector('#sendMessage').addEventListener('click', function (e) {
-                e.preventDefault();
+
+
+
+
+        });
+
+        //enter key sends message
+        document.querySelector('#newMessage').onkeypress = function (e) {
+            if (!e) e = window.event;
+            var keyCode = e.keyCode || e.which;
+            if (keyCode == '13') {
+                // Enter pressed
                 var dest = document.querySelector('#convoContainer');
                 var currentConvo = dest.getAttribute('currentconvo');
                 console.log(currentConvo);
                 messenger.createNewMessage(user, currentConvo);
-            });
-    
-            //initiate tabs
-            var tabs = document.querySelectorAll('.tabs');
-            for (var i = 0; i < tabs.length; i++) {
-                M.Tabs.init(tabs[i]);
             }
-            //initiate autocomplete
-            app.findUserAutoComplete(user);
-        
+        }
+
+        //register click events
+        document.querySelector('#sendMessage').addEventListener('click', function (e) {
+            e.preventDefault();
+            var dest = document.querySelector('#convoContainer');
+            var currentConvo = dest.getAttribute('currentconvo');
+            console.log(currentConvo);
+            messenger.createNewMessage(user, currentConvo);
+        });
+
+        //initiate tabs
+        var tabs = document.querySelectorAll('.tabs');
+        for (var i = 0; i < tabs.length; i++) {
+            M.Tabs.init(tabs[i]);
+        }
+        //initiate autocomplete
+        app.findUserAutoComplete(user);
+
     },
     getConvo: function (user, members, messageType) {
         console.log(members);
@@ -203,12 +203,14 @@ var messenger = {
                                </div>`;
 
             convoContainer.innerHTML = prevMessages + nextMessage;
+           
+            convoContainer.scrollTop = convoContainer.scrollHeight;
         });
 
 
 
     },
-    
+
     displayUsers: function (user) {
         var target = document.querySelector('#conversations');
         firebase.database().ref('users/').on('child_added', function (snapshot) {
@@ -238,7 +240,7 @@ var messenger = {
                                 </div>
                               </div>`;
             target.innerHTML = priorContent + newContent;
-            
+
             //chat button
             var startChat = document.querySelectorAll('.chatButton');
             console.log(startChat.length);
@@ -325,7 +327,7 @@ var messenger = {
             var keepContent = convoPanel.innerHTML;
             var newConvoPreview = `<div class='row' id='${snap.key}'>
                                     <div id="convoImg-${snap.key}" class="col s4">
-                                        <img id="convoImg-${convoID}">
+                                        <img id="convoImg-${convoID}" class="responsive-img">
                                     </div>
                                     <div id="convoInfo-${snap.key}" class="col s8"></div>
                                     </div>`;
@@ -333,6 +335,7 @@ var messenger = {
 
             console.log(data.type);
             if (data.type === 'direct') {
+
                 var convoTitleRef = firebase.database().ref().child('convo-members').child(snap.key);
                 convoTitleRef.on('value', function (snap) {
                     var data = snap.val();
@@ -344,7 +347,9 @@ var messenger = {
                         getTitleRef.on('value', function (snap) {
                             var data = snap.val();
                             var convoTitle = `<div>${data.firstName} ${data.lastName}</div>`;
-                            var currentPreviewContainer = document.querySelector("#convoInfo-"+convoID);
+                            var currentPreviewContainer = document.querySelector("#convoInfo-" + convoID);
+                            var previewImg = document.querySelector('#convoImg-' + convoID);
+                            previewImg.setAttribute('src', data.profilePic);
                             currentPreviewContainer.innerHTML = convoTitle;
                             console.log(currentPreviewContainer);
                             var keepContent = currentPreviewContainer.innerHTML;
@@ -353,28 +358,26 @@ var messenger = {
                                 var key = snap.key;
                                 var data = snap.val();
 
-
                                 console.log(data);
                                 console.log(data.message);
 
-
                                 var lastMessage = `<div id="lastMessage">${data.message}</div>`
-                                
-                               
+
                                 currentPreviewContainer.innerHTML = keepContent + lastMessage
                             });
-
 
                         });
                     } else {
                         console.log('not match');
                         console.log('match');
-                        
+
                         var getTitleRef = firebase.database().ref().child('users').child(keys[0]);
                         getTitleRef.on('value', function (snap) {
                             var data = snap.val();
                             var convoTitle = `<div>${data.firstName} ${data.lastName}</div>`;
-                            var currentPreviewContainer = document.querySelector("#convoInfo-"+convoID);
+                            var currentPreviewContainer = document.querySelector("#convoInfo-" + convoID);
+                            var previewImg = document.querySelector('#convoImg-' + convoID);
+                            previewImg.setAttribute('src', data.profilePic);
                             currentPreviewContainer.innerHTML = convoTitle;
                             console.log(convoID);
                             var keepContent = currentPreviewContainer.innerHTML;
@@ -385,7 +388,7 @@ var messenger = {
                                 console.log(data);
                                 console.log(data.message);
                                 var lastMessage = `<div>${data.message}</div>`
-                                
+
                                 currentPreviewContainer.innerHTML = keepContent + lastMessage
                             })
 
@@ -407,29 +410,29 @@ var messenger = {
     },
     createNewMessage: function (user, currentConvo) {
         console.log(user);
-        if(currentConvo !== "blank"){
-        var newMessage = document.querySelector('#newMessage').value;
-        var newKey = firebase.database().ref().push().key;
-        var convosRef = firebase.database().ref().child('convos');
-        var currentTimestamp = firebase.database.ServerValue.TIMESTAMP;
-        var currentConvoRef = convosRef.child(currentConvo);
-        currentConvoRef.child('lastUpdated').set(currentTimestamp);
-        var convosMessagesRef = firebase.database().ref().child('convo-messages').child(currentConvo);
-        convosMessagesRef.child(newKey).set({
-            message: newMessage,
-            sender: user.uid,
-            timestamp: currentTimestamp,
-        });
-        var userConvosRef = firebase.database().ref().child('convos-' + user.uid).child(currentConvo).child('timestamp');
-        userConvosRef.set(currentTimestamp);
+        if (currentConvo !== "blank") {
+            var newMessage = document.querySelector('#newMessage').value;
+            var newKey = firebase.database().ref().push().key;
+            var convosRef = firebase.database().ref().child('convos');
+            var currentTimestamp = firebase.database.ServerValue.TIMESTAMP;
+            var currentConvoRef = convosRef.child(currentConvo);
+            currentConvoRef.child('lastUpdated').set(currentTimestamp);
+            var convosMessagesRef = firebase.database().ref().child('convo-messages').child(currentConvo);
+            convosMessagesRef.child(newKey).set({
+                message: newMessage,
+                sender: user.uid,
+                timestamp: currentTimestamp,
+            });
+            var userConvosRef = firebase.database().ref().child('convos-' + user.uid).child(currentConvo).child('timestamp');
+            userConvosRef.set(currentTimestamp);
 
-        // app.displayCurrentConvo(user, currentConvo);
-        document.querySelector('#newMessage').value = '';
-    }
+            // app.displayCurrentConvo(user, currentConvo);
+            document.querySelector('#newMessage').value = '';
+        }
     },
-    init: function(user){
-            messenger.UI(user);
-            console.log(`Messenger Loaded`);
-        
+    init: function (user) {
+        messenger.UI(user);
+        console.log(`Messenger Loaded`);
+
     }
 }
