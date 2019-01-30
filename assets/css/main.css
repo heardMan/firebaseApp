@@ -162,6 +162,12 @@ i.icon-light {
     overflow: scroll;
 }
 
+#discover{
+    height: 51.5vh;
+    overflow-wrap: break-word;
+    overflow: scroll;
+}
+
 #conversations{
     height: 51.5vh;
     overflow-wrap: break-word;

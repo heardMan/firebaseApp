@@ -3,9 +3,9 @@ var messenger = {
 
 
 
-        var conversations = `<div id="conversations">
-                                
-                            </div>`;
+        var discover = `<div id="discover"></div>`;
+
+        var conversations = `<div id="conversations"></div>`;
 
         var convoPanel = `<div id='convoPanel' class='card-panel teal'></div>`;
 
@@ -56,12 +56,13 @@ var messenger = {
                                         </div>
                                         
                                         <div id='messengerContent' class='card-content grey lighten-4'>
-                                            ${conversations}
-                                            ${messages}
+                                            ${discover +conversations +messages}
+                                            
                                         </div>
     
                                         <div class='card-tabs'>
                                             <ul class='tabs tabs-fixed-width'>
+                                                <li id='discoverTab' class='tab'><a id="discoverTabLink" href='#discover'>Discover</a></li>
                                                 <li id='conversationsTab' class='tab'><a id="conversationsTabLink" href='#conversations'>Conversations</a></li>
                                                 <li id='messagesTab'class='tab'><a id="messagesTabLink" href='#messages'>Messages</a></li>
                                             </ul>
@@ -139,6 +140,9 @@ var messenger = {
     getConvo: function (user, members, messageType) {
         console.log(members);
         console.log(user.uid);
+        if(members[0] === members[1]){
+            console.log("rick n morty")
+        }
         var returnedData;
         var cMRef = firebase.database().ref("convo-members").orderByChild(user.uid).equalTo(messageType);
         cMRef.once('value', function (snapshot) {
@@ -148,6 +152,7 @@ var messenger = {
                 returnedData = 'no convo yet';
             }
         }).then(function () {
+
             function aMatch() {
                 var keys = Object.keys(returnedData);
                 for (var i = 0; i < keys.length; i++) {
@@ -169,6 +174,7 @@ var messenger = {
                     }
                 }
             }
+            
             var matchFound = aMatch();
             console.log(matchFound);
             if (!matchFound) {
@@ -210,12 +216,18 @@ var messenger = {
 
 
     },
+    conversationView: function(){
 
+    },
     displayUsers: function (user) {
-        var target = document.querySelector('#conversations');
+        var target = document.querySelector('#discover');
         firebase.database().ref('users/').on('child_added', function (snapshot) {
             var data = snapshot.val();
+            var userID = data.userID;
+            console.log(userID);
+            if(userID === user.uid){
 
+            } else {
             var priorContent = target.innerHTML;
             var img = data.profilePic;
             var nameData = data.firstName + ' ' + data.lastName;
@@ -266,13 +278,16 @@ var messenger = {
 
                 });
             }
-
+        }
         });
 
     },
     createConversation: function (user, members, messageType) {
         var userID = user.uid;
         console.log(user);
+        if(members[0] === members[1]){
+            console.log("rick n morty");
+        }
         // Get a key for a new Post.
 
         var root = firebase.database().ref();
