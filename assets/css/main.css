@@ -161,6 +161,9 @@ i.icon-light {
     overflow-wrap: break-word;
     overflow: scroll;
 }
+.convo-prev:hover{
+ background-color: #00796b;
+}
 
 #discover{
     height: 51.5vh;

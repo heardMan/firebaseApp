@@ -220,6 +220,7 @@ var messenger = {
 
     },
     displayUsers: function (user) {
+
         var target = document.querySelector('#discover');
         firebase.database().ref('users/').on('child_added', function (snapshot) {
             var data = snapshot.val();
@@ -340,8 +341,8 @@ var messenger = {
             var convoID = snap.key;
             var convoPanel = document.querySelector('#convoPanel');
             var keepContent = convoPanel.innerHTML;
-            var newConvoPreview = `<div class='row' id='${snap.key}'>
-                                    <div id="convoImg-${snap.key}" class="col s4">
+            var newConvoPreview = `<div class='row convo-prev' id='${snap.key}'>
+                                    <div id="convoImgCont-${snap.key}" class="col s4">
                                         <img id="convoImg-${convoID}" class="responsive-img">
                                     </div>
                                     <div id="convoInfo-${snap.key}" class="col s8"></div>
